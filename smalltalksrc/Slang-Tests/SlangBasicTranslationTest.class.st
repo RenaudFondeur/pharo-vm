@@ -912,6 +912,89 @@ SlangBasicTranslationTest >> testBlockValueWithVariableAsLastExpression [
 }'
 ]
 
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testCallMethodWithAnnotationReturnTypeBoolChainCall [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #callMethodWithAnnotationReturnTypeBoolChainCall.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#callMethodWithAnnotationReturnTypeBoolChainCall */
+static WKBytecodeMethod *
+callMethodWithAnnotationReturnTypeBoolChainCall(void)
+{
+	/* begin methodWithAnnotationReturnTypeBoolChainCall */
+	return 1;
+}'
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testCallMethodWithAnnotationReturnTypePtr [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #callMethodWithAnnotationReturnTypePtr.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#callMethodWithAnnotationReturnTypePtr */
+static WKBytecodeMethod *
+callMethodWithAnnotationReturnTypePtr(void)
+{
+	/* begin methodWithAnnotationReturnTypePtr1 */
+	return 5;
+}'
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testCallTwoMethodsWithAnnotationReturnTypePtrAndHasAnnotationNotWorking [
+	"no inline"
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #callTwoMethodsWithAnnotationReturnTypePtrAndHasAnnotation.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#callTwoMethodsWithAnnotationReturnTypePtrAndHasAnnotation */
+static WKBytecodeMethod *
+callTwoMethodsWithAnnotationReturnTypePtrAndHasAnnotation(void)
+{
+	return (methodWithAnnotationReturnTypePtr1()) - (methodWithAnnotationReturnTypePtr2());
+}'
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testCallTwoMethodsWithAnnotationReturnTypePtrNotWorking [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #callTwoMethodsWithAnnotationReturnTypePtr.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#callTwoMethodsWithAnnotationReturnTypePtr */
+static sqInt
+callTwoMethodsWithAnnotationReturnTypePtr(void)
+{
+	return (methodWithAnnotationReturnTypePtr1()) - (methodWithAnnotationReturnTypePtr2());
+}'
+]
+
 { #category : #'tests-case' }
 SlangBasicTranslationTest >> testCaseStatementIsTranslatedAsSwitch [
 
@@ -1866,6 +1949,46 @@ SlangBasicTranslationTest >> testMethodVolatileLocals [
 		equals: '	volatile int a;
 	volatile int b;
 	volatile float foo;'
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testMethodWithAnnotationReturnTypeChainCall [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #methodWithAnnotationReturnTypeBoolChainCall.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#methodWithAnnotationReturnTypeBoolChainCall */
+static WKBytecodeMethod *
+methodWithAnnotationReturnTypeBoolChainCall(void)
+{
+	return 1;
+}'
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testMethodWithAnnotationReturnTypePtr1 [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #methodWithAnnotationReturnTypePtr1.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#methodWithAnnotationReturnTypePtr1 */
+static WKBytecodeMethod *
+methodWithAnnotationReturnTypePtr1(void)
+{
+	return 5;
+}'
 ]
 
 { #category : #'tests-method' }

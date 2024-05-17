@@ -22,6 +22,28 @@ SlangBasicTranslationTestClass class >> objectMemoryClass [
 	^ nil
 ]
 
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> callMethodWithAnnotationReturnTypeBoolChainCall [
+	^ self methodWithAnnotationReturnTypeBoolChainCall
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> callMethodWithAnnotationReturnTypePtr [
+	^ self methodWithAnnotationReturnTypePtr1
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> callTwoMethodsWithAnnotationReturnTypePtr [
+	^ self methodWithAnnotationReturnTypePtr1 - self methodWithAnnotationReturnTypePtr2
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> callTwoMethodsWithAnnotationReturnTypePtrAndHasAnnotation [
+	<returnTypeC: 'WKBytecodeMethod *'>
+	<inline: true>
+	^ self methodWithAnnotationReturnTypePtr1 - self methodWithAnnotationReturnTypePtr2
+]
+
 { #category : #inline }
 SlangBasicTranslationTestClass >> continue [
 	"reserved name selector"
@@ -175,6 +197,30 @@ SlangBasicTranslationTestClass >> methodWithAnOptionPragma [
 
 	<option: #OPTION>
 	
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> methodWithAnnotationReturnTypeBoolChainCall [
+	<returnTypeC: 'WKBytecodeMethod *'>
+	<inline: true>
+	
+	^ self methodWithRepeatedCFunctionName
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> methodWithAnnotationReturnTypePtr1 [
+	<returnTypeC: 'WKBytecodeMethod *'>
+	<inline: true>
+	
+	^ 5
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> methodWithAnnotationReturnTypePtr2 [
+	<returnTypeC: 'WKBytecodeMethod *'>
+	<inline: true>
+	
+	^ 15
 ]
 
 { #category : #inline }
