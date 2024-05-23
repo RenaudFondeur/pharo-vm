@@ -31,6 +31,22 @@ Class {
 	#category : #'Slang-Tests'
 }
 
+{ #category : #helpers }
+SlangBasicTypeInferenceTest >> astTranslate: tast inStream: aWriteStream [ 
+	
+	| cAST prettyPrinter |
+	cAST := tast asCASTIn: ccg.
+	prettyPrinter := CSlangPrettyPrinter new.
+	prettyPrinter writeStream: aWriteStream.
+	cAST acceptVisitor: prettyPrinter.
+]
+
+{ #category : #helpers }
+SlangBasicTypeInferenceTest >> getTMethodFrom: selector [
+	ccg prepareMethods.
+	^ ccg methodNamed: selector
+]
+
 { #category : #running }
 SlangBasicTypeInferenceTest >> setUp [
 	super setUp.
@@ -139,6 +155,82 @@ SlangBasicTypeInferenceTest >> testAnIntLess32ConstantNode [
 
 ]
 
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testInlineWithIntAssignement [
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #intAssignement.
+	ccg doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTypeInferenceTestClass>>#intAssignement */
+static sqInt
+intAssignement(void)
+{
+	int i;
+	int t;
+
+	i = t;
+	return 0;
+}'
+]
+
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testInlineWithUnknownAssignement [
+	
+	"incorrect inlining"
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #unknownAssignement.
+	ccg doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTypeInferenceTestClass>>#unknownAssignement */
+static sqInt
+unknownAssignement(void)
+{
+	sqInt i;
+	unknown t;
+
+	i = t;
+	return 0;
+}'
+]
+
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testInlineWithVoidAssignement [
+	
+	"incorrect inlining"
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #voidAssignement.
+	ccg doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTypeInferenceTestClass>>#voidAssignement */
+static sqInt
+voidAssignement(void)
+{
+	sqInt i;
+	void t;
+
+	i = t;
+	return 0;
+}'
+]
+
 { #category : #'incorrect-inference' }
 SlangBasicTypeInferenceTest >> testIntAssignement [
 	| tMethod |
@@ -147,6 +239,15 @@ SlangBasicTypeInferenceTest >> testIntAssignement [
 	self assert: tMethod isNotNil.
 	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #int.
 	self assert: tMethod returnType equals: #sqInt
+]
+
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testIntAssignementBindParseTree [
+	
+	| tMethod |
+	tMethod := self getTMethodFrom: #intAssignement.
+	tMethod 
+
 ]
 
 { #category : #'return-constant' }
@@ -834,4 +935,21 @@ SlangBasicTypeInferenceTest >> testVoidAssignement [
 	self assert: tMethod isNotNil.
 	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #void.
 	self assert: tMethod returnType equals: #sqInt
+]
+
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testVoidAssignementBindParseTree [
+	| tMethod |
+	tMethod := self getTMethodFrom: #voidAssignement.
+	tMethod 
+
+]
+
+{ #category : #helpers }
+SlangBasicTypeInferenceTest >> translate: tast [
+
+	^ String streamContents: [ :str | 
+		self
+			perform: (#astTranslate , #':inStream:') asSymbol
+			withArguments: { tast . str } ]
 ]
