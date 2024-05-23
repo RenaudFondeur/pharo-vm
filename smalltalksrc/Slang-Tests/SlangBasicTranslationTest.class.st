@@ -955,6 +955,27 @@ callMethodWithAnnotationReturnTypePtr(void)
 ]
 
 { #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testCallMethodWithReturnIntCCoerceToPtr [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #callMethodWithReturnIntCCoerceToPtr.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#callMethodWithReturnIntCCoerceToPtr */
+static WKBytecodeMethod *
+callMethodWithReturnIntCCoerceToPtr(void)
+{
+	/* begin methodWithReturnIntCCoerceToPtr */
+	return ((WKBytecodeMethod *) 15 );
+}'
+]
+
+{ #category : #'experiment-inline' }
 SlangBasicTranslationTest >> testCallTwoMethodsWithAnnotationReturnTypePtrAndHasAnnotationNotWorking [
 	"no inline"
 	| translation tMethod |
@@ -1895,6 +1916,26 @@ SlangBasicTranslationTest >> testMethodRenamesReservedSelectorName [
 continue_1(void)')
 ]
 
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testMethodReturnError [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #methodReturnAnError.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#methodReturnAnError */
+static sqInt
+methodReturnAnError(void)
+{
+	return error("unaligned access");
+}'
+]
+
 { #category : #'tests-method' }
 SlangBasicTranslationTest >> testMethodReturnType [
 
@@ -2001,6 +2042,26 @@ SlangBasicTranslationTest >> testMethodWithNoParameter [
 	self
 		assert: (translation lineNumber: 5)
 		equals: 'methodWithMultilineComment(void)'
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testMethodWithReturnIntCCoerceToPtr [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #methodWithReturnIntCCoerceToPtr.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#methodWithReturnIntCCoerceToPtr */
+static WKBytecodeMethod *
+methodWithReturnIntCCoerceToPtr(void)
+{
+	return ((WKBytecodeMethod *) 15 );
+}'
 ]
 
 { #category : #'tests-method' }

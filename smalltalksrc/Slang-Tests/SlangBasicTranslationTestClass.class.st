@@ -33,6 +33,13 @@ SlangBasicTranslationTestClass >> callMethodWithAnnotationReturnTypePtr [
 ]
 
 { #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> callMethodWithReturnIntCCoerceToPtr [
+	<inline: true>
+	
+	^ self methodWithReturnIntCCoerceToPtr
+]
+
+{ #category : #'experiment-inline' }
 SlangBasicTranslationTestClass >> callTwoMethodsWithAnnotationReturnTypePtr [
 	^ self methodWithAnnotationReturnTypePtr1 - self methodWithAnnotationReturnTypePtr2
 ]
@@ -123,6 +130,11 @@ SlangBasicTranslationTestClass >> methodFromWithAnnotations: pFrom to: pTo len: 
 
 	0 to: len - 1 do: [ : i | pTo at: i put: (pFrom at: i) ].
 	^ 0
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> methodReturnAnError [
+	^ self error: 'unaligned access'
 ]
 
 { #category : #inline }
@@ -290,6 +302,13 @@ SlangBasicTranslationTestClass >> methodWithReservedWordLocal: register [
 	| case |
 	case := register nextPutAll: 'foo'
 	
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> methodWithReturnIntCCoerceToPtr [
+	<inline: true>
+	
+	^ self cCoerce: 15 to: 'WKBytecodeMethod *'
 ]
 
 { #category : #inline }
