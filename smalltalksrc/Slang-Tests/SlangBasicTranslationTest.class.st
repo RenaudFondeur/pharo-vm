@@ -310,7 +310,6 @@ SlangBasicTranslationTest >> testBasicInlineFalse [
 	tMethod := self getTMethodFrom: #methodCallingMethodWithInlinePragma.
 	tMethod recordDeclarationsIn: generator.
 	generator doBasicInlining: false.
-	
 	translation := self translate: tMethod.
 	translation := translation trimBoth.
 	
