@@ -139,6 +139,16 @@ SlangBasicTypeInferenceTest >> testAnIntLess32ConstantNode [
 
 ]
 
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTest >> testIntAssignement [
+	| tMethod |
+	tMethod := ccg methodNamed: #intAssignement.
+	self halt.
+	self assert: tMethod isNotNil.
+	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #int.
+	self assert: tMethod returnType equals: #sqInt
+]
+
 { #category : #'return-constant' }
 SlangBasicTypeInferenceTest >> testReturnABigNegativeIntegerConstantNode [
 	| tMethod |
@@ -804,4 +814,24 @@ SlangBasicTypeInferenceTest >> testReturnTempTrueMessageNode [
 	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #sqInt.
 	self assert: (ccg typeFor: tMethod statements first variable in: tMethod) equals: #sqInt.
 	self assert: tMethod returnType equals: #sqInt.
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTest >> testUnknownAssignement [
+	| tMethod |
+	tMethod := ccg methodNamed: #unknownAssignement.
+	self halt.
+	self assert: tMethod isNotNil.
+	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #unknown.
+	self assert: tMethod returnType equals: #sqInt
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTest >> testVoidAssignement [
+	| tMethod |
+	tMethod := ccg methodNamed: #voidAssignement.
+	self halt.
+	self assert: tMethod isNotNil.
+	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #void.
+	self assert: tMethod returnType equals: #sqInt
 ]

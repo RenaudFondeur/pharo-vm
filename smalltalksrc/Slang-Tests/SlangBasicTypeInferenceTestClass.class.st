@@ -63,6 +63,15 @@ SlangBasicTypeInferenceTestClass >> anIntLesser32ConstantNode [
 	30
 ]
 
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> intAssignement [ 
+	<var:#t type:#'int'>
+	| i t |
+	i := t
+	
+	
+]
+
 { #category : #'return-constant' }
 SlangBasicTypeInferenceTestClass >> returnABigNegativeIntegerConstantNode [
 "SmallInteger maxVal on a 64bit system"
@@ -438,4 +447,22 @@ SlangBasicTypeInferenceTestClass >> returnTempTrueMessageNode [
 	| t |
 	t := self returnATrueConstantNode.
 	^ t
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> unknownAssignement [ 
+	<var:#t type:#'unknown'>
+	| i t |
+	i := t
+	
+	
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> voidAssignement [ 
+	<var:#t type:#'void'>
+	| i t |
+	i := t
+	
+	
 ]
