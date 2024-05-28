@@ -10,7 +10,7 @@ SlangStructureTest >> setUp [
 	ccg addClass: WKBytecodeElement.
 	ccg addClass: WKBytecodeClass.
 	ccg addClass: WKBytecodeMethod.
-	
+	ccg prepareMethods.
 	ccg inferTypes.
 ]
 
