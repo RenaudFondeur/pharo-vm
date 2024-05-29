@@ -3089,6 +3089,7 @@ TMethod >> transformToStructClassMethodFor: aCCodeGenerator [
 	 right struct type. As a complete hack to avoid breaking the inlinert don't use 'self' as the name for self
 	 as this causes serious type redefinitions ``somewhere'' in the inliner."
 	| replacements selfNode typeForSelf |
+	self halt.
 	self isStructAccessor ifTrue:
 		[^self returnType: (definingClass returnTypeForAccessor: selector)].
 	replacements := IdentityDictionary new.

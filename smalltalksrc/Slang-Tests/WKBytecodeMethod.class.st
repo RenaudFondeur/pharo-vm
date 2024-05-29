@@ -15,6 +15,5 @@ Class {
 { #category : #accessing }
 WKBytecodeMethod >> methodLiteralAt: anInteger [
 	<var: #bytecodeClass type: #WKBytecodeClass>
-	
 	^ bytecodeClass classLiteralAt: anInteger
 ]

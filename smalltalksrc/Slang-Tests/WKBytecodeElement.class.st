@@ -14,6 +14,6 @@ WKBytecodeElement >> abstractMethod [
 
 { #category : #accessing }
 WKBytecodeElement >> classLiteralAt: anInteger [
-
+	<inline: true>
 	^ literals at: anInteger
 ]
