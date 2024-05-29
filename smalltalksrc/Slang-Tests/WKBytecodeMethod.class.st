@@ -17,3 +17,9 @@ WKBytecodeMethod >> methodLiteralAt: anInteger [
 	<var: #bytecodeClass type: #WKBytecodeClass>
 	^ bytecodeClass classLiteralAt: anInteger
 ]
+
+{ #category : #accessing }
+WKBytecodeMethod >> methodLiteralAtNotAbstract: anInteger [
+	<var: #bytecodeClass type: #WKBytecodeClass>
+	^ bytecodeClass classLiteralAtNotAbstract: anInteger
+]

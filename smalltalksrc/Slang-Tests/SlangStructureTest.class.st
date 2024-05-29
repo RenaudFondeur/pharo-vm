@@ -27,7 +27,6 @@ SlangStructureTest >> getTMethodFrom: selector [
 { #category : #running }
 SlangStructureTest >> setUp [
 	super setUp.
-	self halt.
 	ccg addStructClass: WKBytecodeElement.
 	ccg addStructClass: WKBytecodeClass.
 	ccg addStructClass: WKBytecodeMethod.
@@ -42,14 +41,12 @@ SlangStructureTest >> testClassLiteralAt [
 	self assert: tMethod returnType equals: #sqInt
 ]
 
-{ #category : #'experiment-struct' }
+{ #category : #'experiment-struct-inlining' }
 SlangStructureTest >> testClassLiteralAtInliNing [
 	| tMethod translation |
 	tMethod := ccg methodNamed: #classLiteralAt:.
 	self assert: tMethod isNotNil.
-	self halt.
 	tMethod recordDeclarationsIn: ccg.
-	self halt.
 	ccg doBasicInlining: true.
 	
 	translation := self translate: tMethod.
@@ -73,14 +70,14 @@ SlangStructureTest >> testClassLiteralAtNotAbstract [
 	self assert: tMethod returnType equals: #sqInt
 ]
 
-{ #category : #'experiment-struct' }
+{ #category : #'experiment-struct-inlining' }
 SlangStructureTest >> testClassLiteralAtNotAbstractInliNing [
 	| tMethod translation |
 	tMethod := ccg methodNamed: #classLiteralAtNotAbstract:.
 	self assert: tMethod isNotNil.
 	
 	tMethod recordDeclarationsIn: ccg.
-	self halt.
+	ccg doBasicInlining: true.
 	translation := self translate: tMethod.
 	translation := translation trimBoth.
 	
@@ -102,18 +99,14 @@ SlangStructureTest >> testMethodLiteralAt [
 	self assert: tMethod returnType equals: #sqInt
 ]
 
-{ #category : #'experiment-struct' }
+{ #category : #'experiment-struct-inlining' }
 SlangStructureTest >> testMethodLiteralAtInliNing [
-	| tMethod translation methodList |
+	| tMethod translation |
 	tMethod := ccg methodNamed: #methodLiteralAt:.
 	self assert: tMethod isNotNil.
 	
 	tMethod recordDeclarationsIn: ccg.
-	
-	methodList := ccg sortMethods: ccg methods.
-	methodList do: [:m | ccg checkForGlobalUsage: (m removeUnusedTempsAndNilIfRequiredIn: ccg) in: m].
-	ccg localizeGlobalVariables.
-	ccg doBasicInlining: false.
+	ccg doBasicInlining: true.
 	
 	translation := self translate: tMethod.
 	translation := translation trimBoth.
@@ -124,7 +117,37 @@ SlangStructureTest >> testMethodLiteralAtInliNing [
 static sqInt
 methodLiteralAt(WKBytecodeMethod * self_in_methodLiteralAt, sqInt anInteger)
 {
-	return classLiteralAt(bytecodeClass(), anInteger);
+	WKBytecodeElement * self_in_classLiteralAt;
+
+	/* begin classLiteralAt: */
+	self_in_classLiteralAt = ((WKBytecodeElement *) (bytecodeClass()) );
+	return literals()[anInteger];
+}'
+]
+
+{ #category : #'experiment-struct-inlining' }
+SlangStructureTest >> testMethodLiteralAtInliNingNotAbstract [
+	| tMethod translation |
+	tMethod := ccg methodNamed: #methodLiteralAtNotAbstract: .
+	self assert: tMethod isNotNil.
+	
+	tMethod recordDeclarationsIn: ccg.
+	ccg doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* WKBytecodeMethod>>#methodLiteralAtNotAbstract: */
+static sqInt
+methodLiteralAtNotAbstract(WKBytecodeMethod * self_in_methodLiteralAtNotAbstract, sqInt anInteger)
+{
+	WKBytecodeClass * self_in_classLiteralAtNotAbstract;
+
+	/* begin classLiteralAtNotAbstract: */
+	self_in_classLiteralAtNotAbstract = ((WKBytecodeClass *) (bytecodeClass()) );
+	return literals()[anInteger];
 }'
 ]
 
