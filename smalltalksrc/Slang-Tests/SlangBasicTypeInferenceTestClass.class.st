@@ -63,6 +63,38 @@ SlangBasicTypeInferenceTestClass >> anIntLesser32ConstantNode [
 	30
 ]
 
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> methodFromWithAnnotations: pFrom to: pTo [
+
+	<var: #pFrom type: #'unsigned int *'>
+	<var: #pTo type: #'unsigned int *'>
+	1 to: 10 do: [ :i | pTo at: i put: (pFrom at: i) ].
+	^ 0
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> methodFromWithLessAnnotations: pFrom to: pTo [
+
+	1 to: 10 do: [ :i | pTo at: i put: (pFrom at: i) ].
+	^ 0
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> methodUseParametersWithAnnotationsBuiltIn: pFrom to: pTo with: anInteger [
+
+	<var: #pTo type: #'unsigned int *'>
+	<var: #pFrom type: #'unsigned int *'>
+	self methodFromWithAnnotations: pFrom + anInteger to: pTo
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> methodUseParametersWithLessAnnotationsBuiltIn: pFrom to: pTo with: anInteger [
+
+	<var: #pTo type: #'unsigned int *'>
+	<var: #pFrom type: #'unsigned int *'>
+	self methodFromWithLessAnnotations: pFrom + anInteger to: pTo
+]
+
 { #category : #'return-constant' }
 SlangBasicTypeInferenceTestClass >> returnABigNegativeIntegerConstantNode [
 "SmallInteger maxVal on a 64bit system"

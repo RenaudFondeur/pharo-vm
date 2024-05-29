@@ -31,6 +31,22 @@ Class {
 	#category : #'Slang-Tests'
 }
 
+{ #category : #helpers }
+SlangBasicTypeInferenceTest >> astTranslate: tast inStream: aWriteStream [ 
+	
+	| cAST prettyPrinter |
+	cAST := tast asCASTIn: ccg.
+	prettyPrinter := CSlangPrettyPrinter new.
+	prettyPrinter writeStream: aWriteStream.
+	cAST acceptVisitor: prettyPrinter.
+]
+
+{ #category : #helpers }
+SlangBasicTypeInferenceTest >> getTMethodFrom: selector [
+	ccg prepareMethods.
+	^ ccg methodNamed: selector
+]
+
 { #category : #running }
 SlangBasicTypeInferenceTest >> setUp [
 	super setUp.
@@ -137,6 +153,67 @@ SlangBasicTypeInferenceTest >> testAnIntLess32ConstantNode [
 	self assert: tMethod isNotNil.
 	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #int.
 
+]
+
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testInlineMethodUseParametersWithAnnotationsBuiltInToWith [
+	
+	"incorrect inlining"
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #methodUseParametersWithAnnotationsBuiltIn:to:with: .
+	ccg doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTypeInferenceTestClass>>#methodUseParametersWithAnnotationsBuiltIn:to:with: */
+static sqInt
+methodUseParametersWithAnnotationsBuiltIntowith(unsigned int *pFrom, unsigned int *pTo, sqInt anInteger)
+{
+	sqInt i;
+	sqInt pFrom1;
+	sqInt pTo1;
+
+	/* begin methodFromWithAnnotations:to: */
+	for (i = 1; i <= 10; i += 1) {
+		pTo[i] = (pFrom + anInteger)[i];
+	};
+	return 0;
+}'
+]
+
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testInlineMethodUseParametersWithLessAnnotationsBuiltInToWith [
+	
+	"incorrect inlining"
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #methodUseParametersWithLessAnnotationsBuiltIn:to:with: .
+	ccg doBasicInlining: true.
+	self halt.
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTypeInferenceTestClass>>#methodUseParametersWithLessAnnotationsBuiltIn:to:with: */
+static sqInt
+methodUseParametersWithLessAnnotationsBuiltIntowith(unsigned int *pFrom, unsigned int *pTo, sqInt anInteger)
+{
+	sqInt i;
+	sqInt pFrom1;
+	sqInt pTo1;
+
+	/* begin methodFromWithLessAnnotations:to: */
+	pFrom1 = ((sqInt) (pFrom + anInteger) );
+	for (i = 1; i <= 10; i += 1) {
+		pTo[i] = pFrom1[i];
+	};
+	return 0;
+}'
 ]
 
 { #category : #'return-constant' }
@@ -804,4 +881,33 @@ SlangBasicTypeInferenceTest >> testReturnTempTrueMessageNode [
 	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #sqInt.
 	self assert: (ccg typeFor: tMethod statements first variable in: tMethod) equals: #sqInt.
 	self assert: tMethod returnType equals: #sqInt.
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTest >> testmethodFromWithAnnotationsTo [
+	| tMethod |
+	tMethod := ccg methodNamed: #methodFromWithAnnotations:to:.
+	self assert: tMethod isNotNil.
+	self assert: (tMethod declarations at:'pTo') equals: #'unsigned int *pTo'.
+	self assert: (tMethod declarations at:'pFrom') equals: #'unsigned int *pFrom'.
+	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #sqInt.
+	self assert: tMethod returnType equals: #sqInt
+]
+
+{ #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTest >> testmethodFromWithLessAnnotationsTo [
+	"no annotation, types stay undetermined"
+	| tMethod |
+	tMethod := ccg methodNamed: #methodFromWithLessAnnotations:to:.
+	self assert: tMethod isNotNil.
+	self assert: (tMethod declarations size) equals: 0.
+]
+
+{ #category : #helpers }
+SlangBasicTypeInferenceTest >> translate: tast [
+
+	^ String streamContents: [ :str | 
+		self
+			perform: (#astTranslate , #':inStream:') asSymbol
+			withArguments: { tast . str } ]
 ]
