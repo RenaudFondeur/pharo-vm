@@ -113,6 +113,7 @@ TMethod >> addVarsDeclarationsAndLabelsOf: methodToBeInlined except: doNotRename
 		addAll: (methodToBeInlined args reject: [ :v | doNotRename includes: v]);
 		addAll: (methodToBeInlined locals reject: [ :v | doNotRename includes: v]);
 		yourself.
+	self haltIf: [ self selector = #methodLiteralAt: ].
 	methodToBeInlined declarations keysAndValuesDo:
 		[ :v :decl |
 		(doNotRename includes: v) ifFalse:
@@ -1610,6 +1611,7 @@ TMethod >> inlineSend: aSendNode directReturn: directReturn exitVar: exitVar in:
 	 types are not propagated."
 
 	| sel meth methArgs exitLabel inlineStmts label exitType elidedArgs |
+	self haltIf: [ selector = #classLiteralAt: ].
 	sel := aSendNode selector.
 	meth := aCodeGen methodNamed: sel.
 	methArgs := meth args.
@@ -3089,7 +3091,6 @@ TMethod >> transformToStructClassMethodFor: aCCodeGenerator [
 	 right struct type. As a complete hack to avoid breaking the inlinert don't use 'self' as the name for self
 	 as this causes serious type redefinitions ``somewhere'' in the inliner."
 	| replacements selfNode typeForSelf |
-	self halt.
 	self isStructAccessor ifTrue:
 		[^self returnType: (definingClass returnTypeForAccessor: selector)].
 	replacements := IdentityDictionary new.
