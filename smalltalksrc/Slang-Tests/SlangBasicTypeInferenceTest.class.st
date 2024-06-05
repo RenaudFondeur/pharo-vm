@@ -178,7 +178,7 @@ methodUseParametersWithAnnotationsBuiltIntowith(unsigned int *pFrom, unsigned in
 	sqInt pTo1;
 
 	/* begin methodFromWithAnnotations:to: */
-	for (i = 1; i <= 10; i += 1) {
+	for (i = 0; i <= 10; i += 1) {
 		pTo[i] = (pFrom + anInteger)[i];
 	};
 	return 0;
@@ -881,6 +881,33 @@ SlangBasicTypeInferenceTest >> testReturnTempTrueMessageNode [
 	self assert: (ccg typeFor: tMethod statements first in: tMethod) equals: #sqInt.
 	self assert: (ccg typeFor: tMethod statements first variable in: tMethod) equals: #sqInt.
 	self assert: tMethod returnType equals: #sqInt.
+]
+
+{ #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testallocateRememberedSetWithRootIndex [
+	| translation tMethod |
+	ccg addClass: SpurMemoryManager.
+	ccg inferTypes.
+	self halt.
+	tMethod := self getTMethodFrom: #allocateRememberedSetWithRootIndex: .
+	ccg doBasicInlining: true.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SpurMemoryManager>>#allocateRememberedSetWithRootIndex: */
+static VMRememberedSet *
+allocateRememberedSetWithRootIndex(sqInt rootIndex)
+{
+	VMRememberedSet *newRememberedSet;
+
+	newRememberedSet = ((VMRememberedSet *) (malloc(sizeof(VMRememberedSet))) );
+	rootIndex(newRememberedSet, rootIndex);
+	return newRememberedSet;
+}'
+	
 ]
 
 { #category : #'incorrect-inference' }

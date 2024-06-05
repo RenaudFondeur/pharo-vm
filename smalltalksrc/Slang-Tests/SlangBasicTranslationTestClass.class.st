@@ -92,6 +92,7 @@ SlangBasicTranslationTestClass >> methodFromWithAnnotations: pFrom to: pTo [
 	<var: #pFrom type: #'unsigned int *'>
 
 	0 to: 10 do: [ : i | pTo at: i put: (pFrom at: i) ].
+	^ 0
 ]
 
 { #category : #'generation-targets' }
