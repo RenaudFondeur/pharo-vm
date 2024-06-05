@@ -23,6 +23,13 @@ SlangBasicTranslationTestClass class >> objectMemoryClass [
 ]
 
 { #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> callMethodReturnInt [
+	<returnTypeC: 'WKBytecodeMethod *'>
+	
+	^ self methodReturnInt
+]
+
+{ #category : #'experiment-inline' }
 SlangBasicTranslationTestClass >> callMethodWithAnnotationReturnTypeBoolChainCall [
 	^ self methodWithAnnotationReturnTypeBoolChainCall
 ]
@@ -135,6 +142,14 @@ SlangBasicTranslationTestClass >> methodFromWithAnnotations: pFrom to: pTo len: 
 { #category : #'experiment-inline' }
 SlangBasicTranslationTestClass >> methodReturnAnError [
 	^ self error: 'unaligned access'
+]
+
+{ #category : #'experiment-inline' }
+SlangBasicTranslationTestClass >> methodReturnInt [ 
+	<var: #i type: #int>
+	| i |
+	i := 5.
+	^ i
 ]
 
 { #category : #inline }

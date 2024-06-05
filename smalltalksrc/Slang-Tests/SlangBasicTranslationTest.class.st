@@ -913,6 +913,30 @@ SlangBasicTranslationTest >> testBlockValueWithVariableAsLastExpression [
 ]
 
 { #category : #'experiment-inline' }
+SlangBasicTranslationTest >> testCallMethodReturnInt [
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #callMethodReturnInt.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#callMethodReturnInt */
+static WKBytecodeMethod *
+callMethodReturnInt(void)
+{
+	int i;
+
+	/* begin methodReturnInt */
+	i = 5;
+	return ((sqInt) i );
+}'
+]
+
+{ #category : #'experiment-inline' }
 SlangBasicTranslationTest >> testCallMethodWithAnnotationReturnTypeBoolChainCall [
 	| translation tMethod |
 	tMethod := self getTMethodFrom: #callMethodWithAnnotationReturnTypeBoolChainCall.
