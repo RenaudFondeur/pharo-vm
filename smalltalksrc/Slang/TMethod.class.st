@@ -113,7 +113,7 @@ TMethod >> addVarsDeclarationsAndLabelsOf: methodToBeInlined except: doNotRename
 		addAll: (methodToBeInlined args reject: [ :v | doNotRename includes: v]);
 		addAll: (methodToBeInlined locals reject: [ :v | doNotRename includes: v]);
 		yourself.
-	self haltIf: [ self selector = #methodLiteralAt: ].
+	self haltIf: [ self selector = #methodLiteralAt ].
 	methodToBeInlined declarations keysAndValuesDo:
 		[ :v :decl |
 		(doNotRename includes: v) ifFalse:

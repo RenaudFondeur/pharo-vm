@@ -993,7 +993,6 @@ CCodeGenerator >> doBasicInlining: inlineFlagOrSymbol [
 				(self sortMethods: methods) doWithIndex: [:m :i |
 					bar value: i.
 					self currentMethod: m.
-					self haltIf: [ m selector = #methodLiteralAt: ].
 					(m tryToInlineMethodsIn: self)
 						ifTrue: [progress := true]]]].
 

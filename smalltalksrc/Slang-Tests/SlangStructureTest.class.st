@@ -16,11 +16,6 @@ SlangStructureTest >> astTranslate: tast inStream: aWriteStream [
 
 { #category : #helpers }
 SlangStructureTest >> getTMethodFrom: selector [
-
-	"Generate a TMethod from a SlangBasicTranslationTestClass method."
-
-	ccg addClass: SlangBasicTranslationTestClass.
-	ccg inferTypes.
 	^ ccg methodNamed: selector
 ]
 
@@ -104,9 +99,9 @@ SlangStructureTest >> testMethodLiteralAtInliNing [
 	| tMethod translation |
 	tMethod := ccg methodNamed: #methodLiteralAt:.
 	self assert: tMethod isNotNil.
-	self halt.
 	tMethod recordDeclarationsIn: ccg.
 	ccg doBasicInlining: true.
+	tMethod declarationAt: #self_in_classLiteralAt put: #'WKBytecodeClass * self_in_classLiteralAt'.
 	self halt.
 	translation := self translate: tMethod.
 	translation := translation trimBoth.
