@@ -182,7 +182,7 @@ intAssignement(void)
 { #category : #'inline-with-incorrect-inference' }
 SlangBasicTypeInferenceTest >> testInlineWithUnknownAssignementNotWorking [
 	
-	"incorrect inlining"
+	"i type isn't a simpleCType, so it must be annotated to produce correct code, here it is not"
 	
 	| translation tMethod |
 	tMethod := self getTMethodFrom: #unknownAssignement.
@@ -206,9 +206,35 @@ unknownAssignement(void)
 ]
 
 { #category : #'inline-with-incorrect-inference' }
+SlangBasicTypeInferenceTest >> testInlineWithUnknownAssignementWithAnnotation [
+	
+	"i type isn't a simpleCType, so it must be annotated to produce correct code"
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #unknownAssignementWithAnnotation.
+	ccg doBasicInlining: false.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTypeInferenceTestClass>>#unknownAssignementWithAnnotation */
+static sqInt
+unknownAssignementWithAnnotation(void)
+{
+	unknown i;
+	unknown t;
+
+	i = t;
+	return 0;
+}'
+]
+
+{ #category : #'inline-with-incorrect-inference' }
 SlangBasicTypeInferenceTest >> testInlineWithVoidAssignementNotWorking [
 	
-	"incorrect inlining"
+	"incorrect C code, void assignemen should be detected"
 	
 	| translation tMethod |
 	tMethod := self getTMethodFrom: #voidAssignement.

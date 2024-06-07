@@ -459,6 +459,16 @@ SlangBasicTypeInferenceTestClass >> unknownAssignement [
 ]
 
 { #category : #'incorrect-inference' }
+SlangBasicTypeInferenceTestClass >> unknownAssignementWithAnnotation [
+	<var:#t type:#'unknown'>
+	<var:#i type:#'unknown'>
+	| i t |
+	i := t
+	
+	
+]
+
+{ #category : #'incorrect-inference' }
 SlangBasicTypeInferenceTestClass >> voidAssignement [ 
 	<var:#t type:#'void'>
 	| i t |

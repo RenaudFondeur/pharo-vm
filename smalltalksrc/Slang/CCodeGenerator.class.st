@@ -3596,7 +3596,7 @@ CCodeGenerator >> isSimpleType: aType [
 	  or: [ (self isIntegralCType: aType)
 		or: [ 
 			"The type affected to literal floating point numbers"
-			aType = #double ]]
+			aType = #double ]]	
 ]
 
 { #category : #inlining }
