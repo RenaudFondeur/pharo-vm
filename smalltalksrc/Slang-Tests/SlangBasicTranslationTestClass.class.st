@@ -209,3 +209,57 @@ SlangBasicTranslationTestClass >> methodWithoutReturn [
 
 	<returnTypeC: #sqInt>
 ]
+
+{ #category : #inline }
+SlangBasicTranslationTestClass >> simpleIfMethod [
+   <var: #i type: #short>
+	<var: #j type: #int>
+	| i j |
+	i := 3.
+	j := 4.
+	i = 3
+	ifTrue: [  
+		^ i
+	]
+	ifFalse: [ 
+		^ j
+	].
+]
+
+{ #category : #inline }
+SlangBasicTranslationTestClass >> simpleIfMethodWithConflict [
+	| i |
+	i := 3.
+	i = 3
+	ifTrue: [  
+		^ i
+	]
+	ifFalse: [ 
+		^ 'conflict'
+	].
+
+
+]
+
+{ #category : #inline }
+SlangBasicTranslationTestClass >> simpleIfMethodWithNumber [
+   <var: #i type: #short>
+	| i |
+	i := 3.
+	i = 3
+	ifTrue: [  
+		^ i
+	]
+	ifFalse: [ 
+		^ 8
+	].
+
+
+]
+
+{ #category : #inline }
+SlangBasicTranslationTestClass >> simpleMethod [
+	| i |
+	i := 5.
+	^ i
+]

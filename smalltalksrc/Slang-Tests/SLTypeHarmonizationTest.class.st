@@ -245,7 +245,6 @@ SLTypeHarmonizationTest >> testHarmonizedLonglongPtr [
 
 { #category : #harmonizeTwoType }
 SLTypeHarmonizationTest >> testHarmonizedNumberAndAnythingChanged [
-	"return anything"
 	| result |
 	types add: 7.
 	types add: #anything.

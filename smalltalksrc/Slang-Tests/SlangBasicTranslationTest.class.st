@@ -5931,6 +5931,127 @@ SlangBasicTranslationTest >> testSendWordSize [
 	self assert: translation equals: 'BytesPerWord'
 ]
 
+{ #category : #'tests-inlinemethod' }
+SlangBasicTranslationTest >> testSimpleIfMethod [
+	
+	"Method with inline pragma are compiled anyway."
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #simpleIfMethod.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#simpleIfMethod */
+static sqInt
+simpleIfMethod(void)
+{
+	short i;
+	int j;
+
+	i = 3;
+	j = 4;
+	if (i == 3) {
+		return i;
+	} else {
+		return j;
+	}
+}'
+]
+
+{ #category : #'tests-inlinemethod' }
+SlangBasicTranslationTest >> testSimpleIfMethodWithConflict [
+	
+	"Method with inline pragma are compiled anyway."
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #simpleIfMethodWithConflict.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#simpleIfMethodWithConflict */
+static sqInt
+simpleIfMethodWithConflict(void)
+{
+	int i;
+
+	i = 3;
+	if (i == 3) {
+		return i;
+	} else {
+		return "conflict";
+	}
+}'
+]
+
+{ #category : #'tests-inlinemethod' }
+SlangBasicTranslationTest >> testSimpleIfMethodWithNumber [
+	
+	"Method with inline pragma are compiled anyway."
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #simpleIfMethodWithNumber.
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: 
+'/* SlangBasicTranslationTestClass>>#simpleIfMethodWithNumber */
+static sqInt
+simpleIfMethodWithNumber(void)
+{
+	short i;
+
+	i = 3;
+	if (i == 3) {
+		return i;
+	} else {
+		return 8;
+	}
+}'
+
+
+]
+
+{ #category : #'tests-inlinemethod' }
+SlangBasicTranslationTest >> testSimpleMethod [
+	
+	"Method with inline pragma are compiled anyway."
+	
+	| translation tMethod |
+	tMethod := self getTMethodFrom: #simpleMethod .
+	tMethod recordDeclarationsIn: generator.
+	generator doBasicInlining: true.
+	
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+	
+	self
+		assert: translation
+		equals: '/* SlangBasicTranslationTestClass>>#simpleMethod */
+static sqInt
+simpleMethod(void)
+{
+	int i;
+
+	i = 5;
+	return i;
+}'
+]
+
 { #category : #'tests-case' }
 SlangBasicTranslationTest >> testSwitchOnCurrentBytecodeAddsPreDispatchHook [
 
