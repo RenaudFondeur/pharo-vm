@@ -58,6 +58,52 @@ SlangTyper >> addTypesFor: node inMethod: method to: typeSet [
 	^ false
 ]
 
+{ #category : #'type inference' }
+SlangTyper >> addTypesFor: node inMethod: method to: typeSet notify: possibleNodesToReplace [
+	"Add the value types for the node to typeSet.
+	 Answer if any type was derived from an as-yet-untyped method or variable, which allows us to abort
+	 inferReturnTypeFromReturnsIn: if the return type depends on a yet-to-be-typed method or variable."
+
+	| expr |
+	expr := node.
+	[ expr isAssignment or: [ expr isStatementList ] ] whileTrue: [
+		expr isAssignment ifTrue: [ expr := expr variable ].
+		expr isStatementList ifTrue: [ expr := expr statements last ] ].
+	expr isSend ifTrue: [
+		(#( ifTrue: ifFalse: #ifTrue:ifFalse: #ifFalse:ifTrue: ) includes:
+			 expr selector) ifTrue: [
+			^ expr arguments inject: false into: [ :asYetUntyped :block |
+				  asYetUntyped
+				  | (self addTypesFor: block inMethod: method to: typeSet) ] ].
+		(codeGenerator returnTypeForSend: expr in: method ifNil: nil)
+			ifNil: [
+				^ (codeGenerator methodNamed: expr selector) notNil and: [
+					  expr selector ~~ method selector ] ]
+			ifNotNil: [ :type |
+				typeSet add: type.
+				^ false ] ].
+	expr isVariable ifTrue: [
+		(codeGenerator typeOfVariable: expr name)
+			ifNotNil: [ :type | typeSet add: type ]
+			ifNil: [
+				(typeSet add: (expr name = 'self'
+						  ifTrue: [
+							  possibleNodesToReplace at: #void put: node.
+							  #void ]
+						  ifFalse: [ expr typeFrom: codeGenerator in: method ]))
+				== #sqInt ifTrue: [ ^ true ] ] ].
+	expr isConstant ifTrue: [
+		(expr value isInteger and: [ expr value >= 0 ])
+			ifTrue: [
+				possibleNodesToReplace at: expr value put: node.
+				typeSet add: expr value ]
+			ifFalse: [ "cannot determine if signed or unsigned yet..."
+				(expr typeOrNilFrom: codeGenerator in: method) ifNotNil: [ :type |
+					possibleNodesToReplace at: type put: node.
+					typeSet add: type ] ] ].
+	^ false
+]
+
 { #category : #accessing }
 SlangTyper >> codeGenerator [
 	^ codeGenerator
@@ -89,9 +135,10 @@ SlangTyper >> inferReturnTypeFromReturnsOf: aMethod [
 	codeGenerator
 		pushScope: aMethod
 		while:
-			[| hasReturn returnTypes |
+			[| hasReturn returnTypes possibleNodesToReplace |
 			 hasReturn := false.
 			 returnTypes := Set new.
+			 possibleNodesToReplace := Dictionary new.
 			 "Debug:
 			 (| rettypes |
 			  rettypes := Dictionary new.
@@ -110,9 +157,9 @@ SlangTyper >> inferReturnTypeFromReturnsOf: aMethod [
 				(self
 					 addTypesFor: node expression
 					 inMethod: aMethod
-					 to: returnTypes) ifTrue: [ ^ self ] ] ].
+					 to: returnTypes notify: possibleNodesToReplace) ifTrue: [ ^ self ] ] ].
 		returnTypes remove: #implicit ifAbsent: [  ].
-		returnTypes := codeGenerator harmonizeReturnTypesIn: returnTypes.
+		returnTypes := codeGenerator harmonizeReturnTypesIn: returnTypes notify: possibleNodesToReplace .
 		hasReturn
 			ifTrue: [ 
 				returnTypes size > 1 ifTrue: [ 
