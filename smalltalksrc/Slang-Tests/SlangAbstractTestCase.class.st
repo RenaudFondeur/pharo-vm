@@ -12,7 +12,7 @@ SlangAbstractTestCase >> assertReturnTypeOf: aMethod equalsHarmonized: expectedT
 
 	"The type inferencer harmonizes return types converting them to the closer sq* integer (either signed or unsigned)"
 	| harmonizedTypes |
-	harmonizedTypes := ccg harmonizeReturnTypesIn: { expectedType } asSet.
+	harmonizedTypes := ccg harmonizeReturnTypesIn: { expectedType -> 1 } asDictionary.
 	self assert: harmonizedTypes size = 1 description: 'There seems to be a type conflict'.
-	self assert: aMethod returnType equals: harmonizedTypes anyOne.
+	self assert: aMethod returnType equals: harmonizedTypes keys anyOne.
 ]
