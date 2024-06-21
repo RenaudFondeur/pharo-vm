@@ -602,50 +602,60 @@ SlangBasicTypeInferenceTest >> testReturnMultipleLongIntNotWorking [
 ]
 
 { #category : #'return-multiple-type' }
-SlangBasicTypeInferenceTest >> testReturnStringAndIntIfTrue1 [
-	"conflict so default to sqInt"
+SlangBasicTypeInferenceTest >> testReturnStringAndIntIfTrue [
+	"consider that the function use ^5 to cut the execution early/signal a failure, so char * get priority"
 	| tMethod |
-	tMethod := ccg methodNamed: #returnStringAndIntInIfTrue1.
+	tMethod := ccg methodNamed: #returnStringAndIntInIfTrue.
 	
 	self assert: tMethod isNotNil.
-	self assert: tMethod returnType equals: #sqInt
+	self assert: tMethod returnType equals: #'char *'
 ]
 
 { #category : #'return-multiple-type' }
 SlangBasicTypeInferenceTest >> testReturnStringAndIntIfTrue2 [
-	"conflict so default to sqInt"
+	"still consider that the function use ^5 to cut the execution early/signal a failure, so char * get priority"
 	| tMethod |
 	tMethod := ccg methodNamed: #returnStringAndIntInIfTrue2.
 	
 	self assert: tMethod isNotNil.
+	self assert: tMethod returnType equals: #'char *'
+]
+
+{ #category : #'return-multiple-type' }
+SlangBasicTypeInferenceTest >> testReturnStringAndIntIfTrueConflict [
+	"conflict so default to sqInt"
+	| tMethod |
+	tMethod := ccg methodNamed: #returnStringAndIntInIfTrueConflict.
+	
+	self assert: tMethod isNotNil.
 	self assert: tMethod returnType equals: #sqInt
 ]
 
 { #category : #'return-multiple-type' }
-SlangBasicTypeInferenceTest >> testReturnStringAndIntInIfTrueifFalse1 [
-	"conflict so default to sqInt"
+SlangBasicTypeInferenceTest >> testReturnStringAndIntInIfTrueifFalse [
+	"consider that the function use ^5 to cut the execution early/signal a failure, so char * get priority"
 	| tMethod |
-	tMethod := ccg methodNamed: #returnStringAndIntInIfTrueifFalse1.
+	tMethod := ccg methodNamed: #returnStringAndIntInIfTrueifFalse.
 	
 	self assert: tMethod isNotNil.
-	self assert: tMethod returnType equals: #sqInt
+	self assert: tMethod returnType equals: #'char *'
 ]
 
 { #category : #'return-multiple-type' }
 SlangBasicTypeInferenceTest >> testReturnStringAndIntInIfTrueifFalse2 [
-	"conflict so default to sqInt"
+	"still consider that the function use ^5 to cut the execution early/signal a failure, so char * get priority"
 	| tMethod |
 	tMethod := ccg methodNamed: #returnStringAndIntInIfTrueifFalse2.
 	
 	self assert: tMethod isNotNil.
-	self assert: tMethod returnType equals: #sqInt
+	self assert: tMethod returnType equals: #'char *'
 ]
 
 { #category : #'return-multiple-type' }
-SlangBasicTypeInferenceTest >> testReturnStringAndIntInIfTrueifFalse3 [
+SlangBasicTypeInferenceTest >> testReturnStringAndIntInIfTrueifFalseConflict [
 	"conflict so default to sqInt"
 	| tMethod |
-	tMethod := ccg methodNamed: #returnStringAndIntInIfTrueifFalse3.
+	tMethod := ccg methodNamed: #returnStringAndIntInIfTrueifFalseConflict.
 	
 	self assert: tMethod isNotNil.
 	self assert: tMethod returnType equals: #sqInt

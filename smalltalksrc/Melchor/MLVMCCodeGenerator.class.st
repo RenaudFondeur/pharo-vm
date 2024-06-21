@@ -32,6 +32,19 @@ MLVMCCodeGenerator >> addType: type To: typeSet [
 	^ type
 ]
 
+{ #category : #'type inference' }
+MLVMCCodeGenerator >> addType: type andNode: node in: possibleNodesToReplace [
+	"add the node in the possibleNodesToReplace Dictionary, the associations are type -> setOfNode"
+
+	possibleNodesToReplace
+		at: type
+		ifPresent: [ (possibleNodesToReplace at: type) add: node ]
+		ifAbsentPut: [
+			Set new
+				add: node;
+				yourself ]
+]
+
 { #category : #'C code generator' }
 MLVMCCodeGenerator >> bytesPerOop [
 	^ self vmmakerConfiguration bytesPerOop
@@ -306,20 +319,31 @@ MLVMCCodeGenerator >> emitGlobalCVariablesOn: aStream [
 ]
 
 { #category : #'type inference' }
-MLVMCCodeGenerator >> harmonizeIntegerIn: aDictionaryOfTypes [
+MLVMCCodeGenerator >> harmonizeIntegerIn: aDictionaryOfTypes notify: possibleNodesToReplace [
 	"help to decide if the element in aDictionaryOfTypes will be treated as signed or unsigned.
 	only add sqInt to the types if an usqInt isn't here to prevent signing method returning usqInt."
-	| constantIntegers |
+
+	| constantIntegers constantIntegerNodes |
 	constantIntegers := aDictionaryOfTypes keys select: [ :element |
 		                    element isInteger ].
 	constantIntegers notEmpty ifFalse: [ ^ self ].
-	constantIntegers do: [:key | aDictionaryOfTypes removeKey: key ].
+	constantIntegerNodes := OrderedCollection new.
+	constantIntegers do: [ :key |
+		aDictionaryOfTypes removeKey: key.
+		constantIntegerNodes addAll: (possibleNodesToReplace at: key).
+		possibleNodesToReplace removeKey: key ].
 	(aDictionaryOfTypes keys includes: #usqInt) ifTrue: [ ^ self ].
-	self addType: #sqInt To: aDictionaryOfTypes
+	constantIntegers do: [ :each |
+		self addType: #sqInt To: aDictionaryOfTypes ].
+	constantIntegerNodes do: [ :constantIntegerNode |
+		self
+			addType: #sqInt
+			andNode: constantIntegerNode
+			in: possibleNodesToReplace ]
 ]
 
 { #category : #'type inference' }
-MLVMCCodeGenerator >> harmonizeReturnTypesIn: aSetOfTypes [
+MLVMCCodeGenerator >> harmonizeReturnTypesIn: aDictionaryOfTypes notify: possibleNodesToReplace [
 	"Eliminate signed/unsigned conflicts in aSetOfTypes. Non-negative integers can be either
 	 signed or unsigned. if possible the type will default to the signed part"
 
@@ -329,42 +353,20 @@ MLVMCCodeGenerator >> harmonizeReturnTypesIn: aSetOfTypes [
 	   #'unsigned int' #'unsigned long long' )
 		with: #( sqInt sqInt sqInt sqLong usqInt usqInt usqInt usqLong )
 		do: [ :type :replacement |
-			(aSetOfTypes includes: type) ifTrue: [
-				aSetOfTypes
-					remove: type;
-					add: replacement ] ].
-	self harmonizeIntegerIn: aSetOfTypes.
-	sqs := aSetOfTypes keys select: [ :t | t beginsWith: 'sq' ].
-	usqs := aSetOfTypes keys select: [ :t | t beginsWith: 'usq' ].
-	^ (sqs size + usqs size = aSetOfTypes size and: [
-		   sqs notEmpty and: [
-			   sqs allSatisfy: [ :t | usqs includes: 'u' , t ] ] ])
-		  ifTrue: [ sqs ]
-		  ifFalse: [ aSetOfTypes ]
-]
-
-{ #category : #'type inference' }
-MLVMCCodeGenerator >> harmonizeReturnTypesIn: aSetOfTypes notify: possibleNodesToReplace [
-	"Eliminate signed/unsigned conflicts in aSetOfTypes. Non-negative integers can be either
-	 signed or unsigned. if possible the type will default to the signed part"
-
-	| sqs usqs |
-	"N.B. Because of LP64 vs LLP64 issues do *not* rename #long to #sqInt or #'unsigned long' to #usqInt"
-	#( char short int #'long long' #'unsigned char' #'unsigned short'
-	   #'unsigned int' #'unsigned long long' )
-		with: #( sqInt sqInt sqInt sqLong usqInt usqInt usqInt usqLong )
-		do: [ :type :replacement |
-			(aSetOfTypes keys includes: type) ifTrue: [
-				self replaceKeyIn: aSetOfTypes oldKey: type newkey: replacement ] ].
-	self harmonizeIntegerIn: aSetOfTypes.
-	self replaceNode: possibleNodesToReplace in: aSetOfTypes.
-	sqs := aSetOfTypes keys select: [ :t | t beginsWith: 'sq' ].
-	usqs := aSetOfTypes keys select: [ :t | t beginsWith: 'usq' ].
-	^ (sqs size + usqs size = aSetOfTypes size and: [
+			(aDictionaryOfTypes keys includes: type) ifTrue: [
+				self replaceKeyIn: aDictionaryOfTypes oldKey: type newkey: replacement ].
+			(possibleNodesToReplace keys includes: type) ifTrue: [
+				self replaceKeyIn: possibleNodesToReplace oldKey: type newkey: replacement ]
+			 ].
+	self harmonizeIntegerIn: aDictionaryOfTypes notify: possibleNodesToReplace.
+	self replaceNode: possibleNodesToReplace in: aDictionaryOfTypes.
+	sqs := aDictionaryOfTypes keys select: [ :t | t beginsWith: 'sq' ].
+	usqs := aDictionaryOfTypes keys select: [ :t | t beginsWith: 'usq' ].
+	^ (sqs size + usqs size = aDictionaryOfTypes size and: [
 		   sqs notEmpty and: [
 			   sqs allSatisfy: [ :t | usqs includes: 'u' , t ] ] ])
 		  ifTrue: [  sqs asSet]
-		  ifFalse: [ aSetOfTypes keys asSet]
+		  ifFalse: [ aDictionaryOfTypes keys asSet]
 ]
 
 { #category : #'C code generator' }
@@ -485,7 +487,7 @@ MLVMCCodeGenerator >> optionIsTrue: pragma in: aClass [
 MLVMCCodeGenerator >> putDefaultValueForType: type in: node [
 
 	| replacement |
-	replacement := 'NULL'.
+	replacement := #NULL.
 	type == 'sqInt' ifTrue: [ replacement := 0 ].
 	node isVariable ifTrue: [ node setName: replacement ].
 	node isConstant ifTrue: [ node setValue: replacement ]
@@ -514,20 +516,22 @@ MLVMCCodeGenerator >> replaceKeyIn: aDictionary oldKey: oldKey newkey: newKey [
 ]
 
 { #category : #'type inference' }
-MLVMCCodeGenerator >> replaceNode: possibleNodesToReplace in: aSetOfTypes [
+MLVMCCodeGenerator >> replaceNode: possibleNodesToReplace in: aDictionaryOfTypes [
 
 	| typeToIgnore |
 	possibleNodesToReplace notEmpty ifFalse: [ ^ self ].
-	typeToIgnore := Set new.
-	aSetOfTypes keysDo: [ :type |
+	typeToIgnore := Dictionary new.
+	aDictionaryOfTypes keysDo: [ :type |
 		(type last == $* or: [
 			 #( #sqIntptr_t #usqIntptr_t #size_t ) includes: type ]) ifTrue: [
 			possibleNodesToReplace associationsDo: [ :pair |
 				(#( #void #sqInt ) includes: pair key) ifTrue: [
-					typeToIgnore add: pair key.
+					typeToIgnore at: pair key put: pair value size.
 					pair value do: [ :node |
 						self putDefaultValueForType: type in: node ] ] ] ] ].
-	typeToIgnore do: [ :type | aSetOfTypes ]
+	typeToIgnore keysDo: [ :type |
+		((aDictionaryOfTypes at: type) == (typeToIgnore at: type)) ifTrue: [
+			aDictionaryOfTypes removeKey: type ] ]
 ]
 
 { #category : #'C code generator' }

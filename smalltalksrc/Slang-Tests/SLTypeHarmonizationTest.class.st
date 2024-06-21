@@ -7,18 +7,35 @@ Class {
 	#category : #'Slang-Tests'
 }
 
+{ #category : #utilities }
+SLTypeHarmonizationTest >> add: type [ 
+	types at: type put: 1
+]
+
+{ #category : #utilities }
+SLTypeHarmonizationTest >> harmonizeReturnTypesIn: aDictionaryOfTypes [
+
+	| constantIntegerNodes |
+	constantIntegerNodes := Dictionary new.
+	(aDictionaryOfTypes keys select: [ :element | element isInteger ]) do: [
+		:each | constantIntegerNodes at: each put: Set new ].
+	^ ccg
+		  harmonizeReturnTypesIn: aDictionaryOfTypes asDictionary
+		  notify: constantIntegerNodes
+]
+
 { #category : #running }
 SLTypeHarmonizationTest >> setUp [
 	super setUp.
-	types := Set new.
+	types := Dictionary new.
 ]
 
 { #category : #harmonizeOneType }
 SLTypeHarmonizationTest >> testHarmonizedChar [
 	"cast a char to an int"
 	| result |
-	types add: #char.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #char.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -27,9 +44,9 @@ SLTypeHarmonizationTest >> testHarmonizedChar [
 { #category : #harmonizeTwoType }
 SLTypeHarmonizationTest >> testHarmonizedCharAndInt [
 	| result |
-	types add: #int.
-	types add: #char.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #char.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -38,9 +55,9 @@ SLTypeHarmonizationTest >> testHarmonizedCharAndInt [
 { #category : #harmonizeTwoType }
 SLTypeHarmonizationTest >> testHarmonizedCharAndUnknown [
 	| result |
-	types add: #unknown.
-	types add: #char.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #unknown.
+	self add: #char.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; add: #unknown ; yourself ).
 	
 	
@@ -50,8 +67,8 @@ SLTypeHarmonizationTest >> testHarmonizedCharAndUnknown [
 SLTypeHarmonizationTest >> testHarmonizedCharPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'char *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'char *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'char *' ; yourself ).
 	
 	
@@ -61,7 +78,7 @@ SLTypeHarmonizationTest >> testHarmonizedCharPtr [
 SLTypeHarmonizationTest >> testHarmonizedEmptyRetrunType [
 	"unknowned type doesn't get any transformation"
 	| result |
-	result := ccg harmonizeReturnTypesIn: types.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new ).
 	
 	
@@ -70,8 +87,8 @@ SLTypeHarmonizationTest >> testHarmonizedEmptyRetrunType [
 { #category : #harmonizeOneType }
 SLTypeHarmonizationTest >> testHarmonizedInt [
 	| result |
-	types add: #int.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -81,9 +98,9 @@ SLTypeHarmonizationTest >> testHarmonizedInt [
 SLTypeHarmonizationTest >> testHarmonizedIntAndLongNotWorking [
 	"the type are not merged"
 	| result |
-	types add: #int.
-	types add: #long.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #long.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; add: #long ; yourself ).
 	
 	
@@ -93,9 +110,9 @@ SLTypeHarmonizationTest >> testHarmonizedIntAndLongNotWorking [
 SLTypeHarmonizationTest >> testHarmonizedIntAndLonglongNotWorking [
 	"the type are not merged"
 	| result |
-	types add: #int.
-	types add: #'long long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #'long long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; add: #sqLong ; yourself ).
 	
 	
@@ -104,9 +121,9 @@ SLTypeHarmonizationTest >> testHarmonizedIntAndLonglongNotWorking [
 { #category : #harmonizeTwoType }
 SLTypeHarmonizationTest >> testHarmonizedIntAndShort [
 	| result |
-	types add: #int.
-	types add: #short.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #short.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -116,11 +133,11 @@ SLTypeHarmonizationTest >> testHarmonizedIntAndShort [
 SLTypeHarmonizationTest >> testHarmonizedIntAndUnsignedIntAndLonglongNotAndUnsignedlonglongWorking [
 	"default to signed type"
 	| result |
-	types add: #int.
-	types add: #'unsigned int'.
-	types add: #'long long'.
-	types add: #'unsigned long long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #'unsigned int'.
+	self add: #'long long'.
+	self add: #'unsigned long long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; add: #sqLong ; yourself ).
 	
 	
@@ -130,10 +147,10 @@ SLTypeHarmonizationTest >> testHarmonizedIntAndUnsignedIntAndLonglongNotAndUnsig
 SLTypeHarmonizationTest >> testHarmonizedIntAndUnsignedIntAndLonglongNotWorking [
 	"default to signed type"
 	| result |
-	types add: #int.
-	types add: #'unsigned int'.
-	types add: #'long long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #'unsigned int'.
+	self add: #'long long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; add: #sqLong ; add: #usqInt ; yourself ).
 	
 	
@@ -143,9 +160,9 @@ SLTypeHarmonizationTest >> testHarmonizedIntAndUnsignedIntAndLonglongNotWorking 
 SLTypeHarmonizationTest >> testHarmonizedIntAndUnsignedIntNotWorking [
 	"default to signed type"
 	| result |
-	types add: #int.
-	types add: #'unsigned int'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #'unsigned int'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -155,8 +172,8 @@ SLTypeHarmonizationTest >> testHarmonizedIntAndUnsignedIntNotWorking [
 SLTypeHarmonizationTest >> testHarmonizedIntPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'int *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'int *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'int *' ; yourself ).
 	
 	
@@ -166,10 +183,10 @@ SLTypeHarmonizationTest >> testHarmonizedIntPtr [
 SLTypeHarmonizationTest >> testHarmonizedKnownTypeAndNotKnownAndUnsignedIntNotWorking [
 	"if at least one of the type isn't in #(char short int #'long long' #'unsigned char' #'unsigned short' #'unsigned int' #'unsigned long long') then it will remain unmerged"
 	| result |
-	types add: #int.
-	types add: #'unsigned int'.
-	types add: #unknown.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #'unsigned int'.
+	self add: #unknown.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; add: #unknown ; add: #usqInt ; yourself ).
 	
 	
@@ -179,10 +196,10 @@ SLTypeHarmonizationTest >> testHarmonizedKnownTypeAndNotKnownAndUnsignedIntNotWo
 SLTypeHarmonizationTest >> testHarmonizedKnownTypeAndNotKnownNotWorking [
 	"if at least one of the type isn't in #(char short int #'long long' #'unsigned char' #'unsigned short' #'unsigned int' #'unsigned long long') then it will remain unmerged"
 	| result |
-	types add: #int.
-	types add: #short.
-	types add: #unknown.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #short.
+	self add: #unknown.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; add: #unknown ; yourself ).
 	
 	
@@ -192,8 +209,8 @@ SLTypeHarmonizationTest >> testHarmonizedKnownTypeAndNotKnownNotWorking [
 SLTypeHarmonizationTest >> testHarmonizedLong [
 	"long type doesn't get any transformation, it counts as unknown"
 	| result |
-	types add: #long.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #long.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #long ; yourself ).
 	
 	
@@ -203,9 +220,9 @@ SLTypeHarmonizationTest >> testHarmonizedLong [
 SLTypeHarmonizationTest >> testHarmonizedLongAndUnsignedLongNotWorking [
 	"doesn't merge the type"
 	| result |
-	types add: #long.
-	types add: #'unsigned long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #long.
+	self add: #'unsigned long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #long ; add: #'unsigned long' ; yourself ).
 	
 	
@@ -215,8 +232,8 @@ SLTypeHarmonizationTest >> testHarmonizedLongAndUnsignedLongNotWorking [
 SLTypeHarmonizationTest >> testHarmonizedLongPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'long *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'long *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'long *' ; yourself ).
 	
 	
@@ -225,8 +242,8 @@ SLTypeHarmonizationTest >> testHarmonizedLongPtr [
 { #category : #harmonizeOneType }
 SLTypeHarmonizationTest >> testHarmonizedLonglong [
 	| result |
-	types add: #'long long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'long long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqLong ; yourself ).
 	
 	
@@ -236,8 +253,8 @@ SLTypeHarmonizationTest >> testHarmonizedLonglong [
 SLTypeHarmonizationTest >> testHarmonizedLonglongPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'long long*'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'long long*'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'long long*' ; yourself ).
 	
 	
@@ -246,8 +263,8 @@ SLTypeHarmonizationTest >> testHarmonizedLonglongPtr [
 { #category : #harmonizeOneType }
 SLTypeHarmonizationTest >> testHarmonizedNumber [
 	| result |
-	types add: 7.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: 7.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -257,9 +274,9 @@ SLTypeHarmonizationTest >> testHarmonizedNumber [
 SLTypeHarmonizationTest >> testHarmonizedNumberAndAnything [
 	"doesn't harmonize and produce a notification"
 	| result |
-	types add: 7.
-	types add: #anything.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: 7.
+	self add: #anything.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #anything ; add: #sqInt ; yourself ).
 	
 	
@@ -268,9 +285,9 @@ SLTypeHarmonizationTest >> testHarmonizedNumberAndAnything [
 { #category : #harmonizeTwoType }
 SLTypeHarmonizationTest >> testHarmonizedNumbers [
 	| result |
-	types add: 7.
-	types add: 8.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: 7.
+	self add: 8.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -280,8 +297,8 @@ SLTypeHarmonizationTest >> testHarmonizedNumbers [
 SLTypeHarmonizationTest >> testHarmonizedShort [
 	"cast short to int"
 	| result |
-	types add: #short.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #short.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -291,8 +308,8 @@ SLTypeHarmonizationTest >> testHarmonizedShort [
 SLTypeHarmonizationTest >> testHarmonizedShortPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'short *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'short *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'short *' ; yourself ).
 	
 	
@@ -301,9 +318,9 @@ SLTypeHarmonizationTest >> testHarmonizedShortPtr [
 { #category : #harmonizeSignedAndUnsigned }
 SLTypeHarmonizationTest >> testHarmonizedSignedUnsignedIntNotWorking [
 	| result |
-	types add: #int.
-	types add: #'unsigned int'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #'unsigned int'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -313,10 +330,10 @@ SLTypeHarmonizationTest >> testHarmonizedSignedUnsignedIntNotWorking [
 SLTypeHarmonizationTest >> testHarmonizedSignedUnsignedNotWorking [
 	"ignore the unsigned long long in the merge operation"
 	| result |
-	types add: #int.
-	types add: #'unsigned int'.
-	types add: #'unsigned long long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #int.
+	self add: #'unsigned int'.
+	self add: #'unsigned long long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #sqInt ; yourself ).
 	
 	
@@ -326,8 +343,8 @@ SLTypeHarmonizationTest >> testHarmonizedSignedUnsignedNotWorking [
 SLTypeHarmonizationTest >> testHarmonizedUnknown [
 	"unknowned type doesn't get any transformation"
 	| result |
-	types add: #unknown.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #unknown.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #unknown ; yourself ).
 	
 	
@@ -337,8 +354,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnknown [
 SLTypeHarmonizationTest >> testHarmonizedUnknownPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'unknown *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unknown *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'unknown *' ; yourself ).
 	
 	
@@ -348,8 +365,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnknownPtr [
 SLTypeHarmonizationTest >> testHarmonizedUnsignedIntPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'unsigned int *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned int *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'unsigned int *' ; yourself ).
 	
 	
@@ -359,8 +376,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedIntPtr [
 SLTypeHarmonizationTest >> testHarmonizedUnsignedchar [
 	"cast an unsigned char to an usqInt"
 	| result |
-	types add: #'unsigned char'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned char'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'usqInt' ; yourself ).
 	
 	
@@ -370,8 +387,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedchar [
 SLTypeHarmonizationTest >> testHarmonizedUnsignedcharPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'unsigned char *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned char *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'unsigned char *' ; yourself ).
 	
 	
@@ -380,8 +397,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedcharPtr [
 { #category : #harmonizeOneType }
 SLTypeHarmonizationTest >> testHarmonizedUnsignedint [
 	| result |
-	types add: #'unsigned int'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned int'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #usqInt ; yourself ).
 	
 	
@@ -391,8 +408,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedint [
 SLTypeHarmonizationTest >> testHarmonizedUnsignedlong [
 	"unsigned long type doesn't get any transformation, it counts as unknown"
 	| result |
-	types add: #'unsigned long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'unsigned long' ; yourself ).
 	
 	
@@ -402,8 +419,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedlong [
 SLTypeHarmonizationTest >> testHarmonizedUnsignedlongPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'unsigned long *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned long *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'unsigned long *' ; yourself ).
 	
 	
@@ -412,8 +429,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedlongPtr [
 { #category : #harmonizeOneType }
 SLTypeHarmonizationTest >> testHarmonizedUnsignedlonglong [
 	| result |
-	types add: #'unsigned long long'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned long long'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'usqLong' ; yourself ).
 	
 	
@@ -423,8 +440,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedlonglong [
 SLTypeHarmonizationTest >> testHarmonizedUnsignedlonglongPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'unsigned long long*'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned long long*'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'unsigned long long*' ; yourself ).
 	
 	
@@ -433,8 +450,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedlonglongPtr [
 { #category : #harmonizeOneType }
 SLTypeHarmonizationTest >> testHarmonizedUnsignedshort [
 	| result |
-	types add: #'unsigned short'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned short'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #usqInt ; yourself ).
 	
 	
@@ -444,8 +461,8 @@ SLTypeHarmonizationTest >> testHarmonizedUnsignedshort [
 SLTypeHarmonizationTest >> testHarmonizedUnsignedshortPtr [
 	"doesn't change the type"
 	| result |
-	types add: #'unsigned short *'.
-	result := ccg harmonizeReturnTypesIn: types.
+	self add: #'unsigned short *'.
+	result := self harmonizeReturnTypesIn: types.
 	self assert: result equals: (Set new add: #'unsigned short *' ; yourself ).
 	
 	

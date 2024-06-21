@@ -43,48 +43,6 @@ SlangTyper >> addType: type andNode: node in: possibleNodesToReplace [
 ]
 
 { #category : #'type inference' }
-SlangTyper >> addTypesFor: node inMethod: method to: typeSet [
-
-	"Add the value types for the node to typeSet.
-	 Answer if any type was derived from an as-yet-untyped method or variable, which allows us to abort
-	 inferReturnTypeFromReturnsIn: if the return type depends on a yet-to-be-typed method or variable."
-
-	| expr |
-	expr := node.
-	[ expr isAssignment or: [ expr isStatementList ] ] whileTrue: [ 
-		expr isAssignment ifTrue: [ expr := expr variable ].
-		expr isStatementList ifTrue: [ expr := expr statements last ] ].
-	expr isSend ifTrue: [ 
-		(#( ifTrue: ifFalse: #ifTrue:ifFalse: #ifFalse:ifTrue: ) includes:
-			 expr selector) ifTrue: [ 
-			^ expr arguments inject: false into: [ :asYetUntyped :block | 
-				  asYetUntyped
-				  | (self addTypesFor: block inMethod: method to: typeSet) ] ].
-		(codeGenerator returnTypeForSend: expr in: method ifNil: nil)
-			ifNil: [ 
-				^ (codeGenerator methodNamed: expr selector) notNil and: [ 
-					  expr selector ~~ method selector ] ]
-			ifNotNil: [ :type | 
-				typeSet add: type.
-				^ false ] ].
-	expr isVariable ifTrue: [ 
-		(codeGenerator typeOfVariable: expr name)
-			ifNotNil: [ :type | typeSet add: type ]
-			ifNil: [ 
-				(typeSet add: (expr name = 'self'
-						  ifTrue: [ #void ]
-						  ifFalse: [ expr typeFrom: codeGenerator in: method ]))
-				== #sqInt ifTrue: [ ^ true ] ] ].
-	expr isConstant ifTrue: [ 
-		(expr value isInteger and: [ expr value >= 0 ])
-			ifTrue: [ typeSet add: expr value ]
-			ifFalse: [ 
-				(expr typeOrNilFrom: codeGenerator in: method) ifNotNil: [ :type | 
-					typeSet add: type ] ] "cannot determine if signed or unsigned yet..." ].
-	^ false
-]
-
-{ #category : #'type inference' }
 SlangTyper >> addTypesFor: node inMethod: method to: typeSet notify: possibleNodesToReplace [
 	"Add the value types for the node to typeSet.
 	 Answer if any type was derived from an as-yet-untyped method or variable, which allows us to abort
@@ -99,8 +57,11 @@ SlangTyper >> addTypesFor: node inMethod: method to: typeSet notify: possibleNod
 		(#( ifTrue: ifFalse: #ifTrue:ifFalse: #ifFalse:ifTrue: ) includes:
 			 expr selector) ifTrue: [
 			^ expr arguments inject: false into: [ :asYetUntyped :block |
-				  asYetUntyped
-				  | (self addTypesFor: block inMethod: method to: typeSet) ] ].
+				  asYetUntyped | (self
+					   addTypesFor: block
+					   inMethod: method
+					   to: typeSet
+					   notify: possibleNodesToReplace) ] ].
 		(codeGenerator returnTypeForSend: expr in: method ifNil: nil)
 			ifNil: [
 				^ (codeGenerator methodNamed: expr selector) notNil and: [
@@ -128,8 +89,7 @@ SlangTyper >> addTypesFor: node inMethod: method to: typeSet notify: possibleNod
 				self addType: type To: typeSet ]
 			ifFalse: [ "cannot determine if signed or unsigned yet..."
 				(expr typeOrNilFrom: codeGenerator in: method) ifNotNil: [ :type |
-					(#( #int #sqInt #void ) includes: type) ifTrue: [
-						self addType: type andNode: node in: possibleNodesToReplace ].
+					self addType: type andNode: node in: possibleNodesToReplace.
 					self addType: type To: typeSet ] ] ].
 	^ false
 ]
@@ -188,7 +148,6 @@ SlangTyper >> inferReturnTypeFromReturnsOf: aMethod [
 					 notify: possibleNodesToReplace) ifTrue: [ ^ self ] ] ].
 		returnTypes removeKey: #implicit ifAbsent: [  ].
 		"return type now become a set"
-		self haltIf: [ aMethod selector = #returnTempBigNegativeIntegerConstantNode ].
 		returnTypes := codeGenerator
 			               harmonizeReturnTypesIn: returnTypes
 			               notify: possibleNodesToReplace.

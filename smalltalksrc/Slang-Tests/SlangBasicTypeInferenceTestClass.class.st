@@ -386,7 +386,7 @@ SlangBasicTypeInferenceTestClass >> returnMultipleLongIntNotWorking [
 ]
 
 { #category : #'return-multiple-type' }
-SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrue1 [ 
+SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrue [ 
 	| i |
 	i := 3.
 	i = 3
@@ -408,7 +408,18 @@ SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrue2 [
 ]
 
 { #category : #'return-multiple-type' }
-SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrueifFalse1 [ 
+SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrueConflict [
+	| i |
+	i := 3.
+	i = 3
+	ifTrue: [  
+		^ 'aa'
+	].
+	^ i
+]
+
+{ #category : #'return-multiple-type' }
+SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrueifFalse [ 
 	| i |
 	i := 3.
 	i = 3
@@ -438,7 +449,7 @@ SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrueifFalse2 [
 ]
 
 { #category : #'return-multiple-type' }
-SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrueifFalse3 [
+SlangBasicTypeInferenceTestClass >> returnStringAndIntInIfTrueifFalseConflict [
 	| i |
 	i := 3.
 	i = 3
