@@ -22,39 +22,109 @@ SLFlexibleTypingTest >> setUp [
 ]
 
 { #category : #'ignore-early-return' }
-SLFlexibleTypingTest >> testMethodWithEarlyReturn [
+SLFlexibleTypingTest >> testMethodWithEarlyReturnEarlyReturnPtrAndNil [
 	| tMethod |
-	tMethod := ccg methodNamed: #methodWithEarlyReturn.
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndNil.
 	
 	self assert: tMethod isNotNil.
 	self assert: tMethod returnType equals: #'char *'
 ]
 
-{ #category : #'ignore-early-return' }
-SLFlexibleTypingTest >> testMethodWithEarlyReturnAndConflict [
-	| tMethod |
-	tMethod := ccg methodNamed: #methodWithEarlyReturnAndConflict.
-	
-	self assert: tMethod isNotNil.
-	self assert: tMethod returnType equals: #sqInt
-]
-
 { #category : #'translation-ignore-early-return' }
-SLFlexibleTypingTest >> testMethodWithEarlyReturnAndConflictTranslation [
-	"conflict so the return type default to sqInt"
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPositiveIntegerTranslation [
+	"maybe useless, produce a conflict"
 
 	| translation tMethod |
-	tMethod := ccg methodNamed: #methodWithEarlyReturnAndConflict.
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndNilPositiveInteger.
 	tMethod recordDeclarationsIn: ccg.
 	ccg doBasicInlining: true.
 
 	translation := self translate: tMethod.
 	translation := translation trimBoth.
 
-	self assert: translation equals: '/*	k introduce an error */
-/* SLFlexibleTypingTestClass>>#methodWithEarlyReturnAndConflict */
+	self
+		assert: translation
+		equals:
+			'/*	positive integers get a special traitment in Slang du to signed/unsigned 
+	resolution, here they should be ignore anyways */
+/* SLFlexibleTypingTestClass>>#methodWithEarlyReturnPtrAndNilPositiveInteger */
 static sqInt
-methodWithEarlyReturnAndConflict(void)
+methodWithEarlyReturnPtrAndNilPositiveInteger(void)
+{
+	sqInt i;
+	char *j;
+
+	if (i == 5) {
+		return NULL;
+	}
+	if (i == 6) {
+		return NULL;
+	}
+	if (i == 7) {
+		return NULL;
+	}
+	return j;
+}'
+]
+
+{ #category : #'translation-ignore-early-return' }
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPtrAndIntTranslation [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndInt.
+	tMethod recordDeclarationsIn: ccg.
+	ccg doBasicInlining: true.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals: '/* SLFlexibleTypingTestClass>>#methodWithEarlyReturnPtrAndInt */
+static sqInt
+methodWithEarlyReturnPtrAndInt(void)
+{
+	sqInt i;
+	char *j;
+
+	if (i == 5) {
+		return NULL;
+	}
+	if (i == 6) {
+		return NULL;
+	}
+	if (i == 7) {
+		return NULL;
+	}
+	return j;
+}'
+]
+
+{ #category : #'ignore-early-return' }
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPtrAndNilConflict [
+	| tMethod |
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndNilConflict.
+	
+	self assert: tMethod isNotNil.
+	self assert: tMethod returnType equals: #sqInt
+]
+
+{ #category : #'translation-ignore-early-return' }
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPtrAndNilConflictTranslation [
+	"conflict so the return type default to sqInt"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndNilConflict.
+	tMethod recordDeclarationsIn: ccg.
+	ccg doBasicInlining: true.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self assert: translation equals: '/*	k introduce a conflict */
+/* SLFlexibleTypingTestClass>>#methodWithEarlyReturnPtrAndNilConflict */
+static sqInt
+methodWithEarlyReturnPtrAndNilConflict(void)
 {
 	sqInt i;
 	char *j;
@@ -77,19 +147,28 @@ methodWithEarlyReturnAndConflict(void)
 ]
 
 { #category : #'ignore-early-return' }
-SLFlexibleTypingTest >> testMethodWithEarlyReturnPositiveInteger [
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPtrAndNilPositiveInteger [
 	| tMethod |
-	tMethod := ccg methodNamed: #methodWithEarlyReturnPositiveInteger.
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndNilPositiveInteger.
 	
 	self assert: tMethod isNotNil.
 	self assert: tMethod returnType equals: #'char *'
 ]
 
+{ #category : #'ignore-early-return' }
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPtrAndNilPositiveIntegerConflict [
+	| tMethod |
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndNilPositiveIntegerConflict.
+	
+	self assert: tMethod isNotNil.
+	self assert: tMethod returnType equals: #sqInt
+]
+
 { #category : #'translation-ignore-early-return' }
-SLFlexibleTypingTest >> testMethodWithEarlyReturnPositiveIntegerTranslation [
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPtrAndNilTranslation [
 
 	| translation tMethod |
-	tMethod := ccg methodNamed: #methodWithEarlyReturnPositiveInteger.
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndNil.
 	tMethod recordDeclarationsIn: ccg.
 	ccg doBasicInlining: true.
 
@@ -98,12 +177,9 @@ SLFlexibleTypingTest >> testMethodWithEarlyReturnPositiveIntegerTranslation [
 
 	self
 		assert: translation
-		equals:
-			'/*	positive integers get a special traitment in Slang du to signed/unsigned 
-	resolution, here they should be ignore anyways */
-/* SLFlexibleTypingTestClass>>#methodWithEarlyReturnPositiveInteger */
+		equals: '/* SLFlexibleTypingTestClass>>#methodWithEarlyReturnPtrAndNil */
 static char *
-methodWithEarlyReturnPositiveInteger(void)
+methodWithEarlyReturnPtrAndNil(void)
 {
 	sqInt i;
 	char *j;
@@ -122,10 +198,10 @@ methodWithEarlyReturnPositiveInteger(void)
 ]
 
 { #category : #'translation-ignore-early-return' }
-SLFlexibleTypingTest >> testMethodWithEarlyReturnTranslation [
+SLFlexibleTypingTest >> testMethodWithEarlyReturnPtrAndSelfTranslation [
 
 	| translation tMethod |
-	tMethod := ccg methodNamed: #methodWithEarlyReturn.
+	tMethod := ccg methodNamed: #methodWithEarlyReturnPtrAndSelf.
 	tMethod recordDeclarationsIn: ccg.
 	ccg doBasicInlining: true.
 
@@ -134,9 +210,9 @@ SLFlexibleTypingTest >> testMethodWithEarlyReturnTranslation [
 
 	self
 		assert: translation
-		equals: '/* SLFlexibleTypingTestClass>>#methodWithEarlyReturn */
-static char *
-methodWithEarlyReturn(void)
+		equals: '/* SLFlexibleTypingTestClass>>#methodWithEarlyReturnPtrAndSelf */
+static sqInt
+methodWithEarlyReturnPtrAndSelf(void)
 {
 	sqInt i;
 	char *j;

@@ -150,7 +150,7 @@ SlangTyper >> inferReturnTypeFromReturnsOf: aMethod [
 		"return type now become a set"
 		returnTypes := codeGenerator
 			               harmonizeReturnTypesIn: returnTypes
-			               notify: possibleNodesToReplace.
+			               notify: possibleNodesToReplace in: aMethod.
 		hasReturn
 			ifTrue: [
 				returnTypes size > 1 ifTrue: [

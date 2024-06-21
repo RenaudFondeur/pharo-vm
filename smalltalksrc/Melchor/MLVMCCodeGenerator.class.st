@@ -45,6 +45,14 @@ MLVMCCodeGenerator >> addType: type andNode: node in: possibleNodesToReplace [
 				yourself ]
 ]
 
+{ #category : #'type inference' }
+MLVMCCodeGenerator >> addTypeToIgnoreIn: typeToIgnore at: type put: aSetOfNode [
+
+	aSetOfNode do: [ :node |
+		(type ~= #sqInt and: [ node value isNil ]) ifTrue: [
+			self addType: type To: typeToIgnore ] ]
+]
+
 { #category : #'C code generator' }
 MLVMCCodeGenerator >> bytesPerOop [
 	^ self vmmakerConfiguration bytesPerOop
@@ -369,6 +377,33 @@ MLVMCCodeGenerator >> harmonizeReturnTypesIn: aDictionaryOfTypes notify: possibl
 		  ifFalse: [ aDictionaryOfTypes keys asSet]
 ]
 
+{ #category : #'type inference' }
+MLVMCCodeGenerator >> harmonizeReturnTypesIn: aDictionaryOfTypes notify: possibleNodesToReplace in: aMethod [
+	"Eliminate signed/unsigned conflicts in aSetOfTypes. Non-negative integers can be either
+	 signed or unsigned. if possible the type will default to the signed part"
+
+	| sqs usqs |
+	"N.B. Because of LP64 vs LLP64 issues do *not* rename #long to #sqInt or #'unsigned long' to #usqInt"
+	#( char short int #'long long' #'unsigned char' #'unsigned short'
+	   #'unsigned int' #'unsigned long long' )
+		with: #( sqInt sqInt sqInt sqLong usqInt usqInt usqInt usqLong )
+		do: [ :type :replacement |
+			(aDictionaryOfTypes keys includes: type) ifTrue: [
+				self replaceKeyIn: aDictionaryOfTypes oldKey: type newkey: replacement ].
+			(possibleNodesToReplace keys includes: type) ifTrue: [
+				self replaceKeyIn: possibleNodesToReplace oldKey: type newkey: replacement ]
+			 ].
+	self harmonizeIntegerIn: aDictionaryOfTypes notify: possibleNodesToReplace.
+	self replaceNode: possibleNodesToReplace in: aDictionaryOfTypes in: aMethod .
+	sqs := aDictionaryOfTypes keys select: [ :t | t beginsWith: 'sq' ].
+	usqs := aDictionaryOfTypes keys select: [ :t | t beginsWith: 'usq' ].
+	^ (sqs size + usqs size = aDictionaryOfTypes size and: [
+		   sqs notEmpty and: [
+			   sqs allSatisfy: [ :t | usqs includes: 'u' , t ] ] ])
+		  ifTrue: [  sqs asSet]
+		  ifFalse: [ aDictionaryOfTypes keys asSet]
+]
+
 { #category : #'C code generator' }
 MLVMCCodeGenerator >> instVarNamesForClass: aClass [
 	^self vmClass
@@ -488,9 +523,27 @@ MLVMCCodeGenerator >> putDefaultValueForType: type in: node [
 
 	| replacement |
 	replacement := #NULL.
-	type == 'sqInt' ifTrue: [ replacement := 0 ].
+	type = #sqInt ifTrue: [ replacement := 0 ].
 	node isVariable ifTrue: [ node setName: replacement ].
 	node isConstant ifTrue: [ node setValue: replacement ]
+]
+
+{ #category : #'type inference' }
+MLVMCCodeGenerator >> removeTypeToIgnoreIn: aDictionaryOfTypes withType: typeToIgnore withNode: possibleNodesToReplace [
+	"check if the type use to cut execution is the correct one"
+	typeToIgnore keysDo: [ :type |
+		((aDictionaryOfTypes at: type) == (typeToIgnore at: type)) ifTrue: [
+			aDictionaryOfTypes removeKey: type ] ].
+	
+	typeToIgnore notEmpty ifTrue: [
+		Transcript show: (String streamContents: [ :s |
+				 s nextPutAll: 'final type : '.
+				 aDictionaryOfTypes keys
+					 do: [ :t | s nextPutAll: t ]
+					 separatedBy: [ s nextPutAll: ', ' ].
+				 s cr ]) ]
+	
+	
 ]
 
 { #category : #'C code generator' }
@@ -532,6 +585,39 @@ MLVMCCodeGenerator >> replaceNode: possibleNodesToReplace in: aDictionaryOfTypes
 	typeToIgnore keysDo: [ :type |
 		((aDictionaryOfTypes at: type) == (typeToIgnore at: type)) ifTrue: [
 			aDictionaryOfTypes removeKey: type ] ]
+]
+
+{ #category : #'type inference' }
+MLVMCCodeGenerator >> replaceNode: possibleNodesToReplace in: aDictionaryOfTypes in: aMethod [
+
+	| typeToIgnore |
+	possibleNodesToReplace notEmpty ifFalse: [ ^ self ].
+	typeToIgnore := Dictionary new.
+	aDictionaryOfTypes keysDo: [ :type |
+		(type last == $* or: [
+			 #( #sqIntptr_t #usqIntptr_t #size_t ) includes: type ]) ifTrue: [
+			possibleNodesToReplace associationsDo: [ :pair |
+				(#( #void #sqInt ) includes: pair key) ifTrue: [
+					Transcript show: (String streamContents: [ :s |
+							 s nextPutAll: 'conflicting return types : '.
+							 aDictionaryOfTypes keys
+								 do: [ :t | s nextPutAll: t ]
+								 separatedBy: [ s nextPutAll: ', ' ].
+							 s cr.
+							 s nextPutAll: 'with nodes : '.
+							 possibleNodesToReplace
+								 do: [ :n | s nextPutAll: n asString ]
+								 separatedBy: [ ', ' ].
+							 s
+								 nextPutAll: ' in ';
+								 nextPutAll: aMethod definingClass name;
+								 nextPutAll: ' >> ';
+								 nextPutAll: aMethod selector;
+								 cr ]).
+					self addTypeToIgnoreIn: typeToIgnore at: pair key put: pair value.
+					pair value do: [ :node |
+						self putDefaultValueForType: type in: node ] ] ] ] ].
+	self removeTypeToIgnoreIn: aDictionaryOfTypes  withType: typeToIgnore  withNode: possibleNodesToReplace.
 ]
 
 { #category : #'C code generator' }
