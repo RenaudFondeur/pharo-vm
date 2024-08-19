@@ -156,10 +156,10 @@ TMethod >> allReferencedVariablesUsing: aCodeGen [
 	parseTree
 		nodesWithParentsDo: [ :node :parent |
 			node isVariable ifTrue: [ refs add: node name asString ].
-			"argument of block in a send like #to:do:, to:by:Do:, etc can be not use explicitly but serve the iteration anyway since the expression will be transformed as a for expression"
+			"send like #value:, value:value: #to:do:, to:by:Do:, etc have blocks as arguments that can not use their own arguments explicitly but serve the expression / iteration anyway since the expression will be transformed as a for expression or an assignement"
 			(node isStatementList and: [
 				 parent isNotNil and: [
-					 parent isSend and: [ parent selector beginsWith: #to: ] ] ])
+					 parent isSend and: [ (parent selector beginsWith: #to:) or: [parent selector beginsWith: #value:] ] ] ] )
 				ifTrue: [
 				node arguments ifNotNil: [ refs addAll: node arguments ] ].
 			(node isSend and: [ node selector value beginsWith: #cCode: ])
@@ -2583,38 +2583,52 @@ TMethod >> removeUnusedTempsAndNilIfRequiredIn: aCodeGen [
 	"Remove all of the unused temps in this method. Answer a set of the references.
 	 As a side-effect introduce explicit temp := nil statements for temps that are
 	 tested for nil before necessarily being assigned."
+
 	| refs readBeforeAssigned simplyTypedLocals |
 	refs := self removeUnusedTempsIn: aCodeGen.
 	"reset the locals to be only those still referred to"
 	cachedLocals := nil.
-	self locals: (self locals select: [:e| refs includes: e]).
-	(self locals notEmpty
-	 and: [aCodeGen
-			pushScope: self
-			while: [simplyTypedLocals := self locals select:
-											[:var|
-											 declarations
-												at: var
-												ifPresent: [:decl| aCodeGen isSimpleType: (aCodeGen extractTypeFor: var fromDeclaration: decl)]
-												ifAbsent: [true]].
-				(readBeforeAssigned := (self findReadBeforeAssignedIn: simplyTypedLocals in: aCodeGen)) notEmpty]]) ifTrue:
-		[readBeforeAssigned := readBeforeAssigned reject:
-			[:v| | d | "don't initialize externs, statics, arrays or the explicitly initialized."
-			 d := self declarationAt: v ifAbsent: [ aCodeGen defaultType , ' ' , v ].
-			 (d beginsWith: 'extern') or: [(d beginsWith: 'static') or: [(d includes: $[) or: [d includes: $=]]]].
-		 parseTree statements addAllFirst:
-			(readBeforeAssigned asSortedCollection collect:
-				[:var| | varNode varType zeroNode |
-				 varNode := TVariableNode new setName: var; yourself.
+	self locals: (self locals select: [ :e | refs includes: e ]).
+	(self locals notEmpty and: [
+		 aCodeGen pushScope: self while: [
+			 simplyTypedLocals := self locals select: [ :var |
+				                      declarations
+					                      at: var
+					                      ifPresent: [ :decl |
+						                      aCodeGen isSimpleType:
+							                      (aCodeGen
+								                       extractTypeFor: var
+								                       fromDeclaration: decl) ]
+					                      ifAbsent: [ true ] ].
+			 (readBeforeAssigned := self
+				                        findReadBeforeAssignedIn:
+				                        simplyTypedLocals
+				                        in: aCodeGen) notEmpty ] ]) ifTrue: [
+		readBeforeAssigned := readBeforeAssigned reject: [ :v |
+			                      | d |
+			                      "don't initialize externs, statics, arrays or the explicitly initialized."
+			                      d := self
+				                           declarationAt: v
+				                           ifAbsent: [
+				                           aCodeGen defaultType , ' ' , v ].
+			                      (d beginsWith: 'extern') or: [
+				                      (d beginsWith: 'static') or: [
+					                      (d includes: $[) or: [ d includes: $= ] ] ] ].
+		parseTree statements addAllFirst:
+			(readBeforeAssigned asSortedCollection collect: [ :var |
+				 | varNode varType zeroNode |
+				 varNode := TVariableNode new
+					            setName: var;
+					            yourself.
 				 varType := aCodeGen typeFor: varNode in: self.
 				 zeroNode := TConstantNode value: 0.
 				 TAssignmentNode new
-					setVariable: varNode
-					expression: (((aCodeGen isIntegralCType: varType)
-								    or: [aCodeGen isFloatingPointCType: varType])
-									ifTrue: [zeroNode]
-									ifFalse: [aCodeGen nodeToCast: zeroNode to: varType])])].
-	^refs
+					 setVariable: varNode
+					 expression: (((aCodeGen isIntegralCType: varType) or: [
+							   aCodeGen isFloatingPointCType: varType ])
+							  ifTrue: [ zeroNode ]
+							  ifFalse: [ aCodeGen nodeToCast: zeroNode to: varType ]) ]) ].
+	^ refs
 ]
 
 { #category : 'utilities' }

@@ -1166,6 +1166,17 @@ SLDeadCodeEliminationTestClass >> methodWithUseArgInBlockToDo [
 	^ r
 ]
 
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUseArgInBlockValue [
+
+	| r j |
+	r := 0.
+	j := 0.
+	[ :i :ignored | i += 1 ] value: r value: j.
+
+	^ r
+]
+
 { #category : 'used-leaf-in-assignment' }
 SLDeadCodeEliminationTestClass >> methodWithVariableInAssignment [
 

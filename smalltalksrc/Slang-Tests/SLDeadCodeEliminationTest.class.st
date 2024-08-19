@@ -3868,6 +3868,37 @@ methodWithUseArgInBlockToDo(SLDeadCodeEliminationTestClass * self_in_methodWithU
 }'
 ]
 
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUseArgInBlockValue [
+	"we do not call the SLDeadCodeEliminationVisitor, actually happens in validClassTableHashes"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUseArgInBlockValue.
+
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUseArgInBlockToDo */
+static sqInt
+methodWithUseArgInBlockToDo(SLDeadCodeEliminationTestClass * self_in_methodWithUseArgInBlockToDo)
+{
+	sqInt i;
+	int r;
+
+	r = 0;
+	for (i = 1; i <= 5; i += 1) {
+		r += 1;
+	};
+	return r;
+}'
+]
+
 { #category : 'used-leaf-in-assignment' }
 SLDeadCodeEliminationTest >> testMethodWithVariableInAssignment [
 
