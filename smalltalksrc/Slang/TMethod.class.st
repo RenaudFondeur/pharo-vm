@@ -147,7 +147,6 @@ TMethod >> allLocals [
 
 { #category : 'accessing' }
 TMethod >> allReferencedVariablesUsing: aCodeGen [
-
 	"Answer the set of all variables referenced in the receiver."
 
 	| refs |
@@ -155,15 +154,19 @@ TMethod >> allReferencedVariablesUsing: aCodeGen [
 	"Find all the variable names referenced in this method.
 	 Don't descend into conditionals that won't be generated."
 	parseTree
-		nodesWithParentsDo: [ :node :parent | 
+		nodesWithParentsDo: [ :node :parent |
 			node isVariable ifTrue: [ refs add: node name asString ].
-			node isStatementList ifTrue: [ 
+			"argument of block in a send like #to:do:, to:by:Do:, etc can be not use explicitly but serve the iteration anyway since the expression will be transformed as a for expression"
+			(node isStatementList and: [
+				 parent isNotNil and: [
+					 parent isSend and: [ parent selector beginsWith: #to: ] ] ])
+				ifTrue: [
 				node arguments ifNotNil: [ refs addAll: node arguments ] ].
-			(node isSend and: [ node selector value beginsWith: #cCode: ]) 
+			(node isSend and: [ node selector value beginsWith: #cCode: ])
 				ifTrue: [ aCodeGen addVariablesInVerbatimCIn: node to: refs ] ]
-		unless: [ :node :parent | 
-			parent notNil and: [ 
-				parent isSend and: [ 
+		unless: [ :node :parent |
+			parent notNil and: [
+				parent isSend and: [
 					aCodeGen nodeIsDeadCode: node withParent: parent ] ] ].
 	^ refs
 ]
@@ -2616,7 +2619,6 @@ TMethod >> removeUnusedTempsAndNilIfRequiredIn: aCodeGen [
 
 { #category : 'utilities' }
 TMethod >> removeUnusedTempsIn: aCodeGen [
-
 	"Remove all of the unused temps in this method. Answer a set of the references."
 
 	"After inlining some variable references are now obsolete, we could fix them there
@@ -2625,17 +2627,19 @@ TMethod >> removeUnusedTempsIn: aCodeGen [
 
 	| usedVariables |
 	usedVariables := self allReferencedVariablesUsing: aCodeGen.
+
 	"reset the locals to be only those still referred to"
-	self locals copy do: [ :local | 
-		(usedVariables includes: local) ifFalse: [ 
+	self locals copy do: [ :local |
+		(usedVariables includes: local) ifFalse: [
 			(((declarations at: local ifAbsent: [ '' ]) includesSubstring:
-				  'static') or: [ 
+				  'static') or: [
 				 (declarations at: local ifAbsent: [ '' ]) includesSubstring:
 					 'extern' ])
-				ifFalse: [ 
+				ifFalse: [
+
 					self removeLocal: local.
 					declarations removeKey: local ifAbsent: [  ] ]
-				ifTrue: [ 
+				ifTrue: [
 					usedVariables add: local "In case this is a function declaration, e.g. amInVMThread in ownVM:" ] ] ].
 	^ usedVariables
 ]

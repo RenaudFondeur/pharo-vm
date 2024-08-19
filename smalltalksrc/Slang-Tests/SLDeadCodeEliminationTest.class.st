@@ -1053,6 +1053,34 @@ methodWithInstanceVariableInReturn(SLDeadCodeEliminationTestClass * self_in_meth
 }'
 ]
 
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUnusedArgInBlock [
+	"we do not call the SLDeadCodeEliminationVisitor"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUnusedArgInBlock.
+
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUnusedArgInBlock */
+static void
+methodWithUnusedArgInBlock(SLDeadCodeEliminationTestClass * self_in_methodWithUnusedArgInBlock)
+{
+	{
+	}
+	{
+		return;
+	}
+}'
+]
+
 { #category : 'unused-leaf' }
 SLDeadCodeEliminationTest >> testMethodWithUnusedConstant [
 
@@ -2763,6 +2791,131 @@ methodWithUnusedInstanceVariableReturnInCaseOfAndUnusedInstanceVariableInOtherwi
 }'
 ]
 
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUnusedTemp [
+	"we do not call the SLDeadCodeEliminationVisitor"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUnusedTemp.
+
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUnusedTemp */
+static void
+methodWithUnusedTemp(SLDeadCodeEliminationTestClass * self_in_methodWithUnusedTemp)
+{
+	{
+	}
+	{
+		return;
+	}
+}'
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUnusedTempInIf [
+	"we do not call the SLDeadCodeEliminationVisitor"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUnusedTempInIf.
+
+
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUnusedTempInIf */
+static void
+methodWithUnusedTempInIf(SLDeadCodeEliminationTestClass * self_in_methodWithUnusedTempInIf)
+{
+	if (1) {
+	}
+	{
+		return;
+	}
+}'
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUnusedTempInIfInlined [
+	"we do not call the SLDeadCodeEliminationVisitor"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUnusedTempInIfInlined.
+
+	ccg doBasicInlining: true.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUnusedTempInIfInlined */
+static void
+methodWithUnusedTempInIfInlined(SLDeadCodeEliminationTestClass * self_in_methodWithUnusedTempInIfInlined)
+{
+	/* begin methodWithUnusedTempInIf */
+	if (1) {
+	}
+	goto l1;
+	l1:
+	;
+	/* end methodWithUnusedTempInIf */
+	{
+		return;
+	}
+}'
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUnusedTempInlined [
+	"we do not call the SLDeadCodeEliminationVisitor"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUnusedTempInlined.
+
+	ccg doBasicInlining: true.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUnusedTempInlined */
+static void
+methodWithUnusedTempInlined(SLDeadCodeEliminationTestClass * self_in_methodWithUnusedTempInlined)
+{
+	/* begin methodWithUnusedTemp */
+	{
+	}
+	goto l1;
+	l1:
+	;
+	/* end methodWithUnusedTemp */
+	{
+		return;
+	}
+}'
+]
+
 { #category : 'unused-leaf' }
 SLDeadCodeEliminationTest >> testMethodWithUnusedVariable [
 
@@ -3650,6 +3803,68 @@ methodWithUnusedVariableReturnInCaseOfAndUnusedVariableInOtherwiseSendInExpressi
 	{
 		return;
 	}
+}'
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUseArgInBlock [
+	"we do not call the SLDeadCodeEliminationVisitor"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUseArgInBlock.
+
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUseArgInBlock */
+static void
+methodWithUseArgInBlock(SLDeadCodeEliminationTestClass * self_in_methodWithUseArgInBlock)
+{
+	sqInt arg;
+	sqInt r;
+
+	arg = 0;
+	do("", (r = arg));
+	{
+		return;
+	}
+}'
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTest >> testMethodWithUseArgInBlockToDo [
+	"we do not call the SLDeadCodeEliminationVisitor"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUseArgInBlockToDo.
+
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationTestClass>>#methodWithUseArgInBlockToDo */
+static sqInt
+methodWithUseArgInBlockToDo(SLDeadCodeEliminationTestClass * self_in_methodWithUseArgInBlockToDo)
+{
+	sqInt i;
+	int r;
+
+	r = 0;
+	for (i = 1; i <= 5; i += 1) {
+		r += 1;
+	};
+	return r;
 }'
 ]
 

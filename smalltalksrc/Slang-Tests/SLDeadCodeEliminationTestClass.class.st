@@ -28,6 +28,8 @@ SLDeadCodeEliminationTestClass >> method [
 
 { #category : 'helpers' }
 SLDeadCodeEliminationTestClass >> method: arg [
+
+	
 ]
 
 { #category : 'method-in-c-coerce' }
@@ -330,6 +332,13 @@ SLDeadCodeEliminationTestClass >> methodWithInstanceVariableInReturn [
 
 	instancesVariable.
 	^ instancesVariable
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUnusedArgInBlock [
+
+	<returnTypeC: #void>
+	[ :arg |  ]
 ]
 
 { #category : 'unused-leaf' }
@@ -827,6 +836,40 @@ SLDeadCodeEliminationTestClass >> methodWithUnusedInstanceVariableReturnInCaseOf
 		otherwise: [ instancesVariable ]
 ]
 
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUnusedTemp [
+
+	<returnTypeC: #void>
+	| i |
+	[
+	| p |
+	 ]
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUnusedTempInIf [
+
+	<returnTypeC: #void>
+	| i |
+	true ifTrue: [
+		| p |
+		 ]
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUnusedTempInIfInlined [
+
+	<returnTypeC: #void>
+	self methodWithUnusedTempInIf
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUnusedTempInlined [
+
+	<returnTypeC: #void>
+	self methodWithUnusedTemp
+]
+
 { #category : 'unused-leaf' }
 SLDeadCodeEliminationTestClass >> methodWithUnusedVariable [
 
@@ -1104,6 +1147,23 @@ SLDeadCodeEliminationTestClass >> methodWithUnusedVariableReturnInCaseOfAndUnuse
 				 i.
 				 ^ i ]) }
 		otherwise: [ i ]
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUseArgInBlock [
+
+	<returnTypeC: #void>
+	| r |
+ 	'' do: [ :arg | r := arg ]
+]
+
+{ #category : 'remove-unused-temp' }
+SLDeadCodeEliminationTestClass >> methodWithUseArgInBlockToDo [
+
+	| r |
+	r := 0.
+ 	1 to: 5 do: [ :i | r := r + 1 ].
+	^ r
 ]
 
 { #category : 'used-leaf-in-assignment' }

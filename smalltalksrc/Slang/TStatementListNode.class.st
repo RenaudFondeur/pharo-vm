@@ -580,6 +580,13 @@ TStatementListNode >> removeAssertions [
 	self setStatements: newStatements asArray
 ]
 
+{ #category : 'transformations' }
+TStatementListNode >> removeLast [
+	"the last statement can be a comment if the TStatementList has been through inlining, remove the actual last statement"
+
+	statements := self allButLastNonCommentStatement
+]
+
 { #category : 'dead-code-elimination' }
 TStatementListNode >> removeUnusedNodesInBranch: aChild [
 	"this method should be only called when cleaning an AST tree after an unused expression was found, remove aChild from the list of statements"
@@ -587,13 +594,6 @@ TStatementListNode >> removeUnusedNodesInBranch: aChild [
 	statements := statements select: [ :stmt | stmt ~~ aChild ].
 	statements isEmpty ifTrue: [
 		self parent removeUnusedNodesInBranch: self ]
-]
-
-{ #category : 'transformations' }
-TStatementListNode >> removeLast [
-	"the last statement can be a comment if the TStatementList has been through inlining, remove the actual last statement"
-
-	statements := self allButLastNonCommentStatement
 ]
 
 { #category : 'inlining support' }
