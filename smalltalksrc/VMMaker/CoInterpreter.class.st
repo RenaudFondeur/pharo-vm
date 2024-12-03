@@ -1177,66 +1177,77 @@ CoInterpreter >> ceCounterTripped: condition [
 
 { #category : 'trampolines' }
 CoInterpreter >> ceInterpretMethodFromPIC: aMethodObj receiver: rcvr [
+
 	<api>
-	| pic primitiveIndex |
 	<var: #pic type: #'CogMethod *'>
+	| pic primitiveIndex |
+	pic := self
+		       cCoerceSimple: self popStack - cogit interpretOffset
+		       to: #'CogMethod *'.
 	"pop off inner return and locate open or closed PIC"
-	pic := self cCoerceSimple: self popStack - cogit interpretOffset to: #'CogMethod *'.
-	self assert: (pic cmType = CMMegamorphicIC or: [pic cmType = CMPolymorphicIC]).
+	self assert:
+		(pic cmType = CMMegamorphicIC or: [ pic cmType = CMPolymorphicIC ]).
 	"If found from an open PIC then it must be an uncogged method and, since it's been found
 	 in the method cache, should be cogged if possible.  If found from a closed PIC then at the
 	 time the closed PIC was created the method was uncoggable, either because there was
 	 no space, it had too many literals or it contained an illegal bytecode).  So don't try and cog
 	 it, but subsequently it may have been cogged via another path.  If the method is, or ends up
 	 cogged, jump to machine code, otherwise interpret."
-	pic cmType = CMMegamorphicIC ifTrue:
-		[self assert: (self methodHasCogMethod: aMethodObj) not.
-		 (self methodShouldBeCogged: aMethodObj) ifTrue:
-			[cogit cog: aMethodObj selector: pic selector]].
-	(self methodHasCogMethod: aMethodObj) ifTrue:
-		[self executeCogMethod: (self cogMethodOf: aMethodObj)
+	pic cmType = CMMegamorphicIC ifTrue: [
+		self assert: (self methodHasCogMethod: aMethodObj) not.
+		(self methodShouldBeCogged: aMethodObj) ifTrue: [
+			cogit cog: aMethodObj selector: pic selector ] ].
+	(self methodHasCogMethod: aMethodObj) ifTrue: [
+		self
+			executeCogMethod: (self cogMethodOf: aMethodObj)
 			fromUnlinkedSendWithReceiver: rcvr
-		 "NOTREACHED"].
+		"NOTREACHED" ].
 	messageSelector := pic selector.
 	newMethod := aMethodObj.
 	primitiveIndex := self primitiveIndexOf: aMethodObj.
-	primitiveFunctionPointer := self functionPointerFor: primitiveIndex inClass: objectMemory nilObject.
+	primitiveFunctionPointer := self functionPointerFor: primitiveIndex.
 	argumentCount := pic cmNumArgs.
 	instructionPointer := self popStack.
-	^self interpretMethodFromMachineCode
+	^ self interpretMethodFromMachineCode
 	"NOTREACHED"
 ]
 
 { #category : 'trampolines' }
 CoInterpreter >> ceMNUFromPICMNUMethod: aMethodObj receiver: rcvr [
+
 	<api>
-	| cPIC primitiveIndex |
 	<var: #cPIC type: #'CogMethod *'>
+	| cPIC primitiveIndex |
 	self assert: (objectMemory addressCouldBeOop: rcvr).
-	self assert: (aMethodObj = 0
-				or: [(objectMemory addressCouldBeObj: aMethodObj)
-					and: [objectMemory isOopCompiledMethod: aMethodObj]]).
-	cPIC := self cCoerceSimple: self popStack - cogit mnuOffset to: #'CogMethod *'.
-	self assert: (cPIC cmType = CMPolymorphicIC or: [cPIC cmType = CMMegamorphicIC]).
+	self assert: (aMethodObj = 0 or: [
+			 (objectMemory addressCouldBeObj: aMethodObj) and: [
+				 objectMemory isOopCompiledMethod: aMethodObj ] ]).
+	cPIC := self
+		        cCoerceSimple: self popStack - cogit mnuOffset
+		        to: #'CogMethod *'.
+	self assert:
+		(cPIC cmType = CMPolymorphicIC or: [ cPIC cmType = CMMegamorphicIC ]).
 	argumentCount := cPIC cmNumArgs.
 	messageSelector := cPIC selector.
-	aMethodObj ~= 0 ifTrue:
-		[instructionPointer := self popStack.
+	aMethodObj ~= 0 ifTrue: [
+		instructionPointer := self popStack.
 		self createActualMessageTo: (objectMemory fetchClassOf: rcvr).
-		(self maybeMethodHasCogMethod: aMethodObj) ifTrue:
-			[self push: instructionPointer.
-			 self executeCogMethod: (self cogMethodOf: aMethodObj)
-				 fromUnlinkedSendWithReceiver: rcvr.
-			 "NOTREACHED"
-			 self assert: false].
+		(self maybeMethodHasCogMethod: aMethodObj) ifTrue: [
+			self push: instructionPointer.
+			self
+				executeCogMethod: (self cogMethodOf: aMethodObj)
+				fromUnlinkedSendWithReceiver: rcvr.
+			"NOTREACHED"
+			self assert: false ].
 		newMethod := aMethodObj.
 		primitiveIndex := self primitiveIndexOf: aMethodObj.
-		primitiveFunctionPointer := self functionPointerFor: primitiveIndex inClass: objectMemory nilObject.
-		^self interpretMethodFromMachineCode].
+		primitiveFunctionPointer := self functionPointerFor: primitiveIndex.
+		^ self interpretMethodFromMachineCode ].
 	"handleMNU:InMachineCodeTo:classForMessage: assumes lkupClass is set, since every other use is
 	 after a lookupMethodNoMNUEtcInClass: call, which sets lkupClass.  Here we must set it manually.
 	 Global variables.  Bah!"
-	self handleMNU: SelectorDoesNotUnderstand
+	self
+		handleMNU: SelectorDoesNotUnderstand
 		InMachineCodeTo: rcvr
 		classForMessage: (lkupClass := objectMemory fetchClassOf: rcvr).
 	"NOTREACHED"
@@ -3008,16 +3019,18 @@ CoInterpreter >> functionForPrimitiveExternalCall: methodObj [
 
 { #category : 'cog jit support' }
 CoInterpreter >> functionPointerForCompiledMethod: methodObj primitiveIndex: primIndex [
+
 	<api>
-	<returnTypeC: 'void (*functionPointerForCompiledMethodprimitiveIndex(sqInt methodObj, sqInt primIndex))(void)'>
-	| functionPointer |
+	<returnTypeC:
+	'void (*functionPointerForCompiledMethodprimitiveIndex(sqInt methodObj, sqInt primIndex))(void)'>
 	<var: #functionPointer declareC: #'void (*functionPointer)(void)'>
-	functionPointer := self functionPointerFor: primIndex inClass: nil.
-	functionPointer == #primitiveCalloutToFFI ifTrue:
-		[^self functionForPrimitiveCallout].
-	functionPointer == #primitiveExternalCall ifTrue:
-		[^self functionForPrimitiveExternalCall: methodObj].
-	^functionPointer
+	| functionPointer |
+	functionPointer := self functionPointerFor: primIndex.
+	functionPointer == #primitiveCalloutToFFI ifTrue: [
+		^ self functionForPrimitiveCallout ].
+	functionPointer == #primitiveExternalCall ifTrue: [
+		^ self functionForPrimitiveExternalCall: methodObj ].
+	^ functionPointer
 ]
 
 { #category : 'object memory support' }

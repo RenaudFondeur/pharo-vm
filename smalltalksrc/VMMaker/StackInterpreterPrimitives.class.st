@@ -1103,46 +1103,49 @@ StackInterpreterPrimitives >> primitiveDoPrimitiveWithArgs [
 	 or Context>>receiver: anObject tryPrimitive: primIndex withArgs: argArray.
 	 If this primitive fails, arrange that its error code is a negative integer, to
 	 distinguish between this failing and the primitive it invokes failing."
+
 	| argumentArray arraySize index primIdx savedNumArgs rcvr |
 	"See checkForAndFollowForwardedPrimitiveState"
 	metaAccessorDepth := -2.
-	(argumentCount between: 2 and: 3) ifFalse:
-		[^self primitiveFailFor: PrimErrUnsupported negated].
+	(argumentCount between: 2 and: 3) ifFalse: [
+		^ self primitiveFailFor: PrimErrUnsupported negated ].
 	argumentArray := self stackTop.
 	primIdx := self stackValue: 1.
-	((objectMemory isArray: argumentArray)
-	 and: [objectMemory isIntegerObject: primIdx]) ifFalse:
-		[^self primitiveFailFor: PrimErrBadArgument negated].
+	((objectMemory isArray: argumentArray) and: [
+		 objectMemory isIntegerObject: primIdx ]) ifFalse: [
+		^ self primitiveFailFor: PrimErrBadArgument negated ].
 	arraySize := objectMemory numSlotsOf: argumentArray.
-	(self roomToPushNArgs: arraySize) ifFalse:
-		[^self primitiveFailFor: PrimErrLimitExceeded negated].
+	(self roomToPushNArgs: arraySize) ifFalse: [
+		^ self primitiveFailFor: PrimErrLimitExceeded negated ].
 
 	primIdx := objectMemory integerValueOf: primIdx.
-	primitiveFunctionPointer := self functionPointerFor: primIdx inClass: nil.
-	primitiveFunctionPointer = 0 ifTrue:
-		[primitiveFunctionPointer := #primitiveDoPrimitiveWithArgs.
-		 ^self primitiveFailFor: PrimErrBadIndex negated].
+	primitiveFunctionPointer := self functionPointerFor: primIdx.
+	primitiveFunctionPointer = 0 ifTrue: [
+		primitiveFunctionPointer := #primitiveDoPrimitiveWithArgs.
+		^ self primitiveFailFor: PrimErrBadIndex negated ].
 
 	"Pop primIndex and argArray, then push args in place..."
 	(savedNumArgs := argumentCount) = 3
-		ifTrue: "...and receiver if the three arg form"
-			[tempOop2 := self stackValue: 4. "actual receiver"
-			 rcvr := self stackValue: 3. "receiver for primitive"
-			 (objectMemory isOopForwarded: rcvr) ifTrue:
-				[rcvr := objectMemory followForwarded: rcvr].
-			 self pop: 4; push: rcvr] "use first arg as receiver"
-		ifFalse:
-			[self pop: 2].
+		ifTrue: [ "use first arg as receiver""...and receiver if the three arg form"
+			tempOop2 := self stackValue: 4. "actual receiver"
+			rcvr := self stackValue: 3. "receiver for primitive"
+			(objectMemory isOopForwarded: rcvr) ifTrue: [
+				rcvr := objectMemory followForwarded: rcvr ].
+			self
+				pop: 4;
+				push: rcvr ]
+		ifFalse: [ self pop: 2 ].
 	argumentCount := arraySize.
 	index := 1.
-	[index <= arraySize] whileTrue:
-		[self push: (objectMemory fetchPointer: index - 1 ofObject: argumentArray).
-		 index := index + 1].
+	[ index <= arraySize ] whileTrue: [
+		self push:
+			(objectMemory fetchPointer: index - 1 ofObject: argumentArray).
+		index := index + 1 ].
 
-	self isPrimitiveFunctionPointerAnIndex ifTrue:
-		[self executeQuickPrimitive.
-		 tempOop2 := 0.
-		^nil].
+	self isPrimitiveFunctionPointerAnIndex ifTrue: [
+		self executeQuickPrimitive.
+		tempOop2 := 0.
+		^ nil ].
 	"We use tempOop instead of pushRemappableOop:/popRemappableOop here because in
 	 the Cogit primitiveEnterCriticalSection, primitiveSignal, primitiveResume et al longjmp back
 	 to either the interpreter or machine code, depending on the process activated.  So if we're
@@ -1157,16 +1160,16 @@ StackInterpreterPrimitives >> primitiveDoPrimitiveWithArgs [
 	metaAccessorDepth := primitiveAccessorDepthTable at: primIdx.
 	self slowPrimitiveResponse.
 
-	self successful ifFalse: "If primitive failed, then restore state for failure code"
-		[self pop: arraySize.
-		 savedNumArgs = 3 ifTrue:
-			[rcvr := self stackTop.
-			 self stackTopPut: tempOop2.
-			 self push: rcvr].
-		 self pushInteger: primIdx.
-		 self push: tempOop.
-		 primitiveFunctionPointer := #primitiveDoPrimitiveWithArgs.
-		 argumentCount := savedNumArgs].
+	self successful ifFalse: [ "If primitive failed, then restore state for failure code"
+		self pop: arraySize.
+		savedNumArgs = 3 ifTrue: [
+			rcvr := self stackTop.
+			self stackTopPut: tempOop2.
+			self push: rcvr ].
+		self pushInteger: primIdx.
+		self push: tempOop.
+		primitiveFunctionPointer := #primitiveDoPrimitiveWithArgs.
+		argumentCount := savedNumArgs ].
 	tempOop := tempOop2 := 0
 ]
 
@@ -1175,15 +1178,16 @@ StackInterpreterPrimitives >> primitiveExecuteMethod [
 	"receiver, args, then method are on top of stack. Execute method against receiver and args.
 	 Set primitiveFunctionPointer because no cache lookup has been done for the method, and
 	 hence primitiveFunctionPointer is stale."
+
 	| methodArgument primitiveIndex |
 	methodArgument := self stackTop.
-	(objectMemory isOopCompiledMethod: methodArgument) ifFalse:
-		[^self primitiveFailFor: PrimErrBadArgument].
-	argumentCount - 1 = (self argumentCountOf: methodArgument) ifFalse:
-		[^self primitiveFailFor: PrimErrBadNumArgs].
+	(objectMemory isOopCompiledMethod: methodArgument) ifFalse: [
+		^ self primitiveFailFor: PrimErrBadArgument ].
+	argumentCount - 1 = (self argumentCountOf: methodArgument) ifFalse: [
+		^ self primitiveFailFor: PrimErrBadNumArgs ].
 	newMethod := self popStack.
 	primitiveIndex := self primitiveIndexOf: newMethod.
-	primitiveFunctionPointer := self functionPointerFor: primitiveIndex inClass: nil.
+	primitiveFunctionPointer := self functionPointerFor: primitiveIndex.
 	argumentCount := argumentCount - 1.
 	self executeNewMethod.
 	"Recursive xeq affects primErrorCode"
@@ -1196,31 +1200,30 @@ StackInterpreterPrimitives >> primitiveExecuteMethodArgsArray [
 	 receiver and args.  Allow for up to two extra arguments (e.g. for mirror primitives).
 	 Set primitiveFunctionPointer because no cache lookup has been done for the
 	 method, and hence primitiveFunctionPointer is stale."
+
 	| methodArgument argCnt rcvr argumentArray primitiveIndex |
 	methodArgument := self stackTop.
 	argumentArray := self stackValue: 1.
-	((objectMemory isOopCompiledMethod: methodArgument)
-	 and: [objectMemory isArray: argumentArray]) ifFalse:
-		[^self primitiveFailFor: PrimErrBadArgument].
+	((objectMemory isOopCompiledMethod: methodArgument) and: [
+		 objectMemory isArray: argumentArray ]) ifFalse: [
+		^ self primitiveFailFor: PrimErrBadArgument ].
 	argCnt := self argumentCountOf: methodArgument.
-	argCnt = (objectMemory numSlotsOf: argumentArray) ifFalse:
-		[^self primitiveFailFor: PrimErrBadNumArgs].
-	argumentCount > 2 ifTrue: "CompiledMethod class>>receiver:withArguments:executeMethod:
+	argCnt = (objectMemory numSlotsOf: argumentArray) ifFalse: [
+		^ self primitiveFailFor: PrimErrBadNumArgs ].
+	argumentCount > 2 ifTrue: [ "CompiledMethod class>>receiver:withArguments:executeMethod:
 								SqueakObjectPrimitives class>>receiver:withArguments:apply:
 								VMMirror>>ifFail:object:with:executeMethod: et al"
-		[rcvr := self stackValue: 2.
-		 (argumentCount > 4
-		  or: [objectMemory isOopForwarded: rcvr]) ifTrue:
-			[^self primitiveFailFor: PrimErrUnsupported].
-		self stackValue: argumentCount put: rcvr]. "replace actual receiver with desired receiver"
+		rcvr := self stackValue: 2.
+		(argumentCount > 4 or: [ objectMemory isOopForwarded: rcvr ])
+			ifTrue: [ ^ self primitiveFailFor: PrimErrUnsupported ].
+		self stackValue: argumentCount put: rcvr ]. "replace actual receiver with desired receiver"
 	"and push the actual arguments"
 	self pop: argumentCount.
-	0 to: argCnt - 1 do:
-		[:i|
-		self push: (objectMemory fetchPointer: i ofObject: argumentArray)].
+	0 to: argCnt - 1 do: [ :i |
+		self push: (objectMemory fetchPointer: i ofObject: argumentArray) ].
 	newMethod := methodArgument.
 	primitiveIndex := self primitiveIndexOf: newMethod.
-	primitiveFunctionPointer := self functionPointerFor: primitiveIndex inClass: nil.
+	primitiveFunctionPointer := self functionPointerFor: primitiveIndex.
 	argumentCount := argCnt.
 	self executeNewMethod.
 	"Recursive xeq affects primErrorCode"

@@ -707,7 +707,7 @@ CogVMSimulator >> functionForPrimitiveExternalCall: methodObj [
 ]
 
 { #category : 'interpreter shell' }
-CogVMSimulator >> functionPointerFor: primIndex inClass: lookupClass [
+CogVMSimulator >> functionPointerFor: primIndex [
 	"Override Interpreter to handle the external primitives caching.  See also
 	 internalExecuteNewMethod."
 
@@ -1431,12 +1431,16 @@ CogVMSimulator >> primitiveContextAtPut [
 
 { #category : 'debugging traps' }
 CogVMSimulator >> primitiveDoPrimitiveWithArgs [
+
 	| primIndex |
 	primIndex := objectMemory integerValueOf: (self stackValue: 1).
-	transcript nextPutAll: 'DO PRIMITIVE: '; print: (self functionPointerFor: primIndex inClass: nil); cr; flush.
-	(#(76 "primitiveStoreStackp" 188 189 "eval method") includes: primIndex) ifTrue:
-		[self halt].
-	^super primitiveDoPrimitiveWithArgs
+	transcript
+		nextPutAll: 'DO PRIMITIVE: ';
+		print: (self functionPointerFor: primIndex);
+		cr;
+		flush.
+	(#( 76 188 189 ) includes: primIndex) ifTrue: [ self halt ]. "primitiveStoreStackp" "eval method"
+	^ super primitiveDoPrimitiveWithArgs
 ]
 
 { #category : 'debugging traps' }
@@ -1869,16 +1873,17 @@ CogVMSimulator >> run [
 CogVMSimulator >> saneFunctionPointerForFailureOfPrimIndex: primIndex [
 	"For simulation override to do the check specially when the
 	 primitiveFunctionPointer is an invalid address proxy for a primitive."
-	| basePrimitive |
-	
-	(primitiveFunctionPointer isInteger
-	and: [self isPrimitiveFunctionPointerAnIndex not
-	and: [primIndex ~= PrimNumberExternalCall
-	and: [(self isMetaPrimitiveIndex: primIndex) not]]]) ifTrue:
-		[basePrimitive := self functionPointerFor: primIndex inClass: objectMemory nilObject.
-		 ^(cogit lookupAddress: primitiveFunctionPointer) endsWith: basePrimitive].
 
-	^super saneFunctionPointerForFailureOfPrimIndex: primIndex
+	| basePrimitive |
+	(primitiveFunctionPointer isInteger and: [
+		 self isPrimitiveFunctionPointerAnIndex not and: [
+			 primIndex ~= PrimNumberExternalCall and: [
+				 (self isMetaPrimitiveIndex: primIndex) not ] ] ]) ifTrue: [
+		basePrimitive := self functionPointerFor: primIndex.
+		^ (cogit lookupAddress: primitiveFunctionPointer) endsWith:
+			  basePrimitive ].
+
+	^ super saneFunctionPointerForFailureOfPrimIndex: primIndex
 ]
 
 { #category : 'I/O primitives' }

@@ -1979,41 +1979,51 @@ StackInterpreter >> addNewMethodToCache: classObj [
 			If there is active contention over the first slot, the second
 				or third will likely be free for reentry after ejection.
 			Also, flushing is good when reprobe chains are getting full."
-	| probe hash primitiveIndex |
-	<inline: false>
-	hash := objectMemory methodCacheHashOf: messageSelector with: (objectMemory classTagForClass: classObj).  "shift drops low-order zeros from addresses"
-	(objectMemory isOopCompiledMethod: newMethod)
-		ifTrue:
-			[primitiveIndex := self primitiveIndexOf: newMethod.
-			 primitiveFunctionPointer := self functionPointerFor: primitiveIndex inClass: classObj]
-		ifFalse:
-			[self assert: ((objectMemory isNonImmediate: newMethod)
-						  and: [objectMemory isForwarded: newMethod]) not.
-			 primitiveFunctionPointer := #primitiveInvokeObjectAsMethod].
 
-	0 to: CacheProbeMax-1 do:
-		[:p | probe := (hash >> p) bitAnd: MethodCacheMask.
-		(methodCache at: probe + MethodCacheSelector) = 0 ifTrue:
-			["Found an empty entry -- use it"
+	<inline: false>
+	| probe hash primitiveIndex |
+	hash := objectMemory
+		        methodCacheHashOf: messageSelector
+		        with: (objectMemory classTagForClass: classObj). "shift drops low-order zeros from addresses"
+	(objectMemory isOopCompiledMethod: newMethod)
+		ifTrue: [
+			primitiveIndex := self primitiveIndexOf: newMethod.
+			primitiveFunctionPointer := self functionPointerFor: primitiveIndex ]
+		ifFalse: [
+			self assert: ((objectMemory isNonImmediate: newMethod) and: [
+					 objectMemory isForwarded: newMethod ]) not.
+			primitiveFunctionPointer := #primitiveInvokeObjectAsMethod ].
+
+	0 to: CacheProbeMax - 1 do: [ :p |
+		probe := hash >> p bitAnd: MethodCacheMask.
+		(methodCache at: probe + MethodCacheSelector) = 0 ifTrue: [ "Found an empty entry -- use it"
 			methodCache at: probe + MethodCacheSelector put: messageSelector.
-			methodCache at: probe + MethodCacheClass put: (objectMemory classTagForClass: classObj).
+			methodCache
+				at: probe + MethodCacheClass
+				put: (objectMemory classTagForClass: classObj).
 			methodCache at: probe + MethodCacheMethod put: newMethod.
-			methodCache at: probe + MethodCachePrimFunction put: (self cCoerce: primitiveFunctionPointer to: #'sqIntptr_t').
+			methodCache
+				at: probe + MethodCachePrimFunction
+				put: (self cCoerce: primitiveFunctionPointer to: #sqIntptr_t).
 			lastMethodCacheProbeWrite := probe. "this for primitiveExternalMethod"
-			^self]].
+			^ self ] ].
 
 	"OK, we failed to find an entry -- install at the first slot..."
-	probe := hash bitAnd: MethodCacheMask.  "first probe"
+	probe := hash bitAnd: MethodCacheMask. "first probe"
 	methodCache at: probe + MethodCacheSelector put: messageSelector.
-	methodCache at: probe + MethodCacheClass put: (objectMemory classTagForClass: classObj).
+	methodCache
+		at: probe + MethodCacheClass
+		put: (objectMemory classTagForClass: classObj).
 	methodCache at: probe + MethodCacheMethod put: newMethod.
-	methodCache at: probe + MethodCachePrimFunction put: (self cCoerce: primitiveFunctionPointer to: #'sqIntptr_t').
+	methodCache
+		at: probe + MethodCachePrimFunction
+		put: (self cCoerce: primitiveFunctionPointer to: #sqIntptr_t).
 	lastMethodCacheProbeWrite := probe. "this for primitiveExternalMethod"
 
 	"...and zap the following entries"
-	1 to: CacheProbeMax-1 do:
-		[:p | probe := (hash >> p) bitAnd: MethodCacheMask.
-		methodCache at: probe + MethodCacheSelector put: 0]
+	1 to: CacheProbeMax - 1 do: [ :p |
+		probe := hash >> p bitAnd: MethodCacheMask.
+		methodCache at: probe + MethodCacheSelector put: 0 ]
 ]
 
 { #category : 'plugin support' }
@@ -6897,12 +6907,12 @@ StackInterpreter >> functionForPrimitiveCallout [
 ]
 
 { #category : 'method lookup cache' }
-StackInterpreter >> functionPointerFor: primIdx inClass: theClass [
+StackInterpreter >> functionPointerFor: primIdx [
 	"Find an actual function pointer for this primitiveIndex.  This is an
 	opportunity to specialise the prim for the relevant class (format for
 	example).  Default for now is simply the entry in the base primitiveTable."
 	<api>
-	<returnTypeC: 'void (*functionPointerForinClass(sqInt primIdx,sqInt theClass))(void)'>
+	<returnTypeC: 'void (*functionPointerFor(sqInt primIdx))(void)'>
 	^primIdx > MaxPrimitiveIndex ifTrue: [0] ifFalse: [primitiveTable at: primIdx]
 ]
 
@@ -9359,15 +9369,18 @@ StackInterpreter >> mappedBackjumpAlwaysInterrupt [
 StackInterpreter >> mappedDirectCall [
 	"250	directCall
 	literal index of the method to call on top of stack =>  (variable number of parameters)"
-	|methodHeader localPrimIndex methodIndex|
+
+	| methodHeader localPrimIndex methodIndex |
 	methodIndex := self popStack. "Can't write this inside next line for Slang inliner"
 	newMethod := self literal: (objectMemory integerValueOf: methodIndex).
 	self assert: (objectMemory isCompiledMethod: newMethod).
 	methodHeader := objectMemory methodHeaderOf: newMethod.
-	localPrimIndex := self primitiveIndexOfMethod: newMethod header: methodHeader.
+	localPrimIndex := self
+		                  primitiveIndexOfMethod: newMethod
+		                  header: methodHeader.
 	argumentCount := self argumentCountOfMethodHeader: methodHeader.
 	"The primitive function pointer is not cached in the interpreter, but it's called quickly in the JIT"
-	primitiveFunctionPointer := self functionPointerFor: localPrimIndex inClass: objectMemory nilObject..
+	primitiveFunctionPointer := self functionPointerFor: localPrimIndex.
 	self activateNewMethod
 ]
 
@@ -13454,12 +13467,15 @@ StackInterpreter >> safeMethodClassOf: methodPointer [
 
 { #category : 'primitive support' }
 StackInterpreter >> saneFunctionPointerForFailureOfPrimIndex: primIndex [
-	| basePrimitive |
+
 	<var: 'basePrimitive' declareC: 'void (*basePrimitive)(void)'>
-	basePrimitive := self functionPointerFor: primIndex inClass: objectMemory nilObject.
-	^primitiveFunctionPointer = basePrimitive
-	  or: [(basePrimitive = #primitiveExternalCall and: [self isPrimitiveFunctionPointerAnIndex not]) 
-	  or: [(self isMetaPrimitiveIndex: primIndex) and: [metaAccessorDepth > -2]]]
+	| basePrimitive |
+	basePrimitive := self functionPointerFor: primIndex.
+	^ primitiveFunctionPointer = basePrimitive or: [
+		  (basePrimitive = #primitiveExternalCall and: [
+			   self isPrimitiveFunctionPointerAnIndex not ]) or: [
+			  (self isMetaPrimitiveIndex: primIndex) and: [
+				  metaAccessorDepth > -2 ] ] ]
 ]
 
 { #category : 'compiled methods' }
