@@ -9,6 +9,17 @@ RBBlockNode >> asTranslatorNodeIn: aTMethod [
 	^ body
 ]
 
+{ #category : '*VMMakerCompatibilityForPharo6' }
+RBBlockNode >> effectiveVariables [
+
+	(self parent isMessage and: [ self parent selector beginsWith: #to: ])
+		ifTrue: [
+			^ self argumentNames asOrderedCollection
+				  addAll: super effectiveVariables;
+				  yourself ].
+	^ super effectiveVariables
+]
+
 { #category : '*VMMakerCompatibilityForPharo6-testing' }
 RBBlockNode >> isBlockNode [
 	^true
