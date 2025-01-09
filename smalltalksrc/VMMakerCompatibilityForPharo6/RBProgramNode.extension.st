@@ -14,6 +14,18 @@ RBProgramNode >> commentOrNil [
 	^ comments collect: #contents
 ]
 
+{ #category : '*VMMakerCompatibilityForPharo6' }
+RBProgramNode >> effectiveVariables [
+
+	| children |
+	children := self children.
+	children isEmpty ifTrue: [ ^ #(  ) ].
+	^ children inject: OrderedCollection new into: [ :vars :each |
+		  vars
+			  addAll: each effectiveVariables;
+			  yourself ]
+]
+
 { #category : '*VMMakerCompatibilityForPharo6-testing' }
 RBProgramNode >> isBlockNode [
 	^false

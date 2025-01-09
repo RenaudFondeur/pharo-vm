@@ -55,12 +55,11 @@ RBMethodNode >> asTranslationMethodOfClass: aTMethodClass forCodeGenerator: aCod
 	].
 
 	renamedSelector := self methodClass renameSelectorIfStaticallyResolved: selector.
-
 	^aTMethodClass new
 		setSelector: renamedSelector
 		definingClass: compilationContext semanticScope targetClass
 		args: arguments
-		locals: ((self allDefinedVariables copyWithoutAll: (arguments collect: #name)) collect: [:string| string -> string])
+		locals: ((self effectiveVariables copyWithoutAll: (arguments collect: #name)) collect: [:string| string -> string])
 		block: (body lastIsReturn
 					ifTrue: [body]
 					ifFalse: [body shallowCopy
@@ -72,6 +71,14 @@ RBMethodNode >> asTranslationMethodOfClass: aTMethodClass forCodeGenerator: aCod
 						ifNotNil: [:pragmaNode| pragmaNode arguments first value])
 		properties: additionalMethodState
 		comment: comment
+]
+
+{ #category : '*VMMakerCompatibilityForPharo6' }
+RBMethodNode >> effectiveVariables [
+
+	^ self argumentNames asOrderedCollection
+		  addAll: super effectiveVariables;
+		  yourself
 ]
 
 { #category : '*VMMakerCompatibilityForPharo6-results' }

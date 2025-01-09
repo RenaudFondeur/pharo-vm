@@ -20,3 +20,11 @@ RBSequenceNode >> asTranslatorNodeIn: aTMethod [
 		  statements: statementList;
 		  comment: self commentOrNil
 ]
+
+{ #category : '*VMMakerCompatibilityForPharo6' }
+RBSequenceNode >> effectiveVariables [
+
+	^(self temporaryNames asOrderedCollection)
+		addAll: super effectiveVariables;
+		yourself
+]
