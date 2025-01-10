@@ -36,30 +36,32 @@ TReturnNode >> accept: aVisitor [
 TReturnNode >> asCASTIn: aBuilder [
 
 	| cast |
-	(expression isSwitch or: [expression isCaseStmt]) ifTrue: [
+	(expression isSwitch or: [ expression isCaseStmt ]) ifTrue: [
 		^ expression asCASTIn: aBuilder addToEndOfCases: self ].
 
-	'void' = aBuilder currentMethod returnType ifTrue: [
-		"If the function is void, don't say 'return x' instead say ' x; return' "
-		| statements |
-		statements := OrderedCollection new.
+	'void' = aBuilder currentMethod returnType ifTrue: [ "If the function is void, don't say 'return x' instead say ' x; return' "
 		expression isLeaf ifFalse: [
-			statements add: (expression asCASTIn: aBuilder) ].
-		statements add: CReturnStatementNode new.
-		^ (CCompoundStatementNode statements: statements)
-			needsBrackets: false "Slang compatibility";
-			yourself ].
-	
+			| statements |
+			statements := OrderedCollection new.
+			statements add: (expression asCASTIn: aBuilder).
+			statements add: CReturnStatementNode new.
+			^ (CCompoundStatementNode statements: statements)
+				  needsBrackets: false;
+				  "Slang compatibility"yourself ].
+		^ CReturnStatementNode new ].
 	cast := expression asCASTExpressionIn: aBuilder.
-	
+
 	"If the expression is a sequence, inject the return at the last element.
 	It may be more clean to do that at the TAST level instead of the CAST level. I dunno."
+
+	cast isEmpty ifTrue: [ ^ CReturnStatementNode new ].
+
 	cast isCompoundStatement ifTrue: [
 		cast last: (CReturnStatementNode expression: cast last).
 		^ cast ].
-		
+
 	"Or else build a return"
-	^ CReturnStatementNode expression: cast.
+	^ CReturnStatementNode expression: cast
 ]
 
 { #category : 'transformations' }
