@@ -166,3 +166,23 @@ RBMessageNode >> asTranslatorNodeIn: aTMethod [
 		  receiver: rcvrOrNil
 		  arguments: args
 ]
+
+{ #category : '*VMMakerCompatibilityForPharo6' }
+RBMessageNode >> effectiveVariables [
+	"for cCode:inSmallTalk and cCode:... in general, the variable outside the cCode shouldn't be declared in C"
+
+	(self selector value beginsWith: #cCode:) ifTrue: [
+		^ self arguments first effectiveVariables
+			  addAll: super effectiveVariables;
+			  yourself ].
+	^ super effectiveVariables
+]
+
+{ #category : '*VMMakerCompatibilityForPharo6' }
+RBMessageNode >> isIterativeOrConditional [
+
+	| name |
+	name := selector value.
+	^ (name beginsWith: #if) or: [
+		  (name beginsWith: #to:) or: [ name beginsWith: #while ] ]
+]

@@ -12,7 +12,7 @@ RBBlockNode >> asTranslatorNodeIn: aTMethod [
 { #category : '*VMMakerCompatibilityForPharo6' }
 RBBlockNode >> effectiveVariables [
 
-	(self parent isMessage and: [ self parent selector beginsWith: #to: ])
+	(self parent isMessage and: [ self parent isIterativeOrConditional ])
 		ifTrue: [
 			^ self argumentNames asOrderedCollection
 				  addAll: super effectiveVariables;
