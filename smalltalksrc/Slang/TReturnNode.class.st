@@ -51,11 +51,10 @@ TReturnNode >> asCASTIn: aBuilder [
 		^ CReturnStatementNode new ].
 	cast := expression asCASTExpressionIn: aBuilder.
 
-	"If the expression is a sequence, inject the return at the last element.
-	It may be more clean to do that at the TAST level instead of the CAST level. I dunno."
-
 	cast isEmpty ifTrue: [ ^ CReturnStatementNode new ].
 
+	"If the expression is a sequence, inject the return at the last element.
+	It may be more clean to do that at the TAST level instead of the CAST level. I dunno."
 	cast isCompoundStatement ifTrue: [
 		cast last: (CReturnStatementNode expression: cast last).
 		^ cast ].

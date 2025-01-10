@@ -2848,41 +2848,30 @@ CCodeGenerator >> generateCASTUnary: tast operator: operator [
 
 { #category : 'CAST translation' }
 CCodeGenerator >> generateCASTValue: tast [
-
 	"Reduce [:formal ... :formalN| body ] value: actual ... value: actualN
 	 to body with formals substituted for by actuals."
 
-	| substitution substitutionDict newLabels castStatements |
+	| substitution substitutionDict newLabels |
 	self assert: tast receiver isStatementList.
 	self assert: tast receiver arguments size = tast arguments size.
-	castStatements := CCompoundStatementNode statements:
-		                  OrderedCollection new.
-	castStatements needsBrackets: false.
 	substitution := tast receiver copy.
 	substitution renameLabelsForInliningInto: self currentMethod.
 	substitutionDict := Dictionary new: tast arguments size * 2.
 	tast receiver arguments
 		with: tast arguments
-		do: [ :argName :exprNode | 
-			exprNode isLeaf
-				ifTrue: [ substitutionDict at: argName put: exprNode ]
-				ifFalse: [ 
-					castStatements add: (CAssignmentNode
-							 lvalue: (CIdentifierNode name: argName)
-							 rvalue: (exprNode asCASTExpressionIn: self)).
-					self noteUsedVariableName: argName ] ].
+		do: [ :argName :exprNode |
+		substitutionDict at: argName put: exprNode ].
 	substitution bindVariablesIn: substitutionDict.
-	substitution setArguments: #(). "no more parameters"
+	substitution setArguments: #(  ). "no more parameters"
 	
-	castStatements add: (substitution asCASTIn: self).
 	newLabels := Set withAll: self currentMethod labels.
-	substitution nodesDo: [ :node | 
-		node isLabel ifTrue: [ 
+	substitution nodesDo: [ :node |
+		node isLabel ifTrue: [
 			node label ifNotNil: [ :label | newLabels add: label ] ] ].
 	"now add the new labels so that a subsequent inline of
 	 the same block will be renamed with different labels."
 	self currentMethod labels: newLabels.
-	^ castStatements
+	^ substitution asCASTIn: self
 ]
 
 { #category : 'CAST translation' }
