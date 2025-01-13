@@ -294,6 +294,11 @@ TAssignmentNode >> removeAssertions [
 	expression removeAssertions
 ]
 
+{ #category : 'dead-code-elimination' }
+TAssignmentNode >> removeUnusedNodesInBranch: aChild [
+	
+]
+
 { #category : 'transformations' }
 TAssignmentNode >> replaceChild: aNode with: aReplacementNode [
 
