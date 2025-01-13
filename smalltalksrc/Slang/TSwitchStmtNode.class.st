@@ -239,8 +239,11 @@ TSwitchStmtNode >> cases [
 
 { #category : 'accessing' }
 TSwitchStmtNode >> cases: anObject [
-	"Set the value of cases"
+	"Set the value of cases, the ast for cases doesn't set the parent correctly making it impossible to iterate throught it from a leaf, it should be fix. the following code only set the top level parent, if one of the two element of a case if a complex ast we probably won't have the expected result"
 
+	anObject do: [ :case |
+		case first do: [ :n | n parent: self].
+		case second parent: self ].
 	cases := anObject
 ]
 
@@ -299,6 +302,7 @@ TSwitchStmtNode >> expression [
 TSwitchStmtNode >> expression: anObject [
 	"Set the value of expression"
 
+	anObject parent: self.
 	expression := anObject
 ]
 

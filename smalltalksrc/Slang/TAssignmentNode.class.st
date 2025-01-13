@@ -300,6 +300,11 @@ TAssignmentNode >> removeAssertions [
 	expression removeAssertions
 ]
 
+{ #category : 'dead-code-elimination' }
+TAssignmentNode >> removeUnusedNodesInBranch: aChild [
+	
+]
+
 { #category : 'transformations' }
 TAssignmentNode >> renameLocalVariablesGivenClassVariables: classVariables globalVariables: globalsVariables classNames: classNames inCodeGenerator: aCodeGen collectingChangesIn: changedVariables [
 	"bind the variables in the left and in the right of the assignment, it is the equivalent of what happened previously with bindVariablesIn:, the class variables can change in value and the globals had no name change i.e: assuming every reference to a global is meant"

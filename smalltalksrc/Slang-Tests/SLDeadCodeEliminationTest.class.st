@@ -20,11 +20,12 @@ SLDeadCodeEliminationTest >> astTranslate: tast inStream: aWriteStream [
 
 { #category : 'running' }
 SLDeadCodeEliminationTest >> setUp [
+
 	super setUp.
 	ccg addStructClass: SLDeadCodeEliminationTestClass.
 	ccg inferTypes.
-	sLDeadCodeEliminationVisitor := SLDeadCodeEliminationVisitor new codeGenerator: ccg
-	
+	sLDeadCodeEliminationVisitor := SLDeadCodeEliminationVisitor new
+		                                codeGenerator: ccg.
 ]
 
 { #category : 'only-comment' }
