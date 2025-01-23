@@ -5,6 +5,7 @@ Class {
 		'codeGenerator',
 		'workList',
 		'markedElements',
+		'markedElementsAsExpression',
 		'currentMethod'
 	],
 	#category : 'Slang',
@@ -15,7 +16,8 @@ Class {
 SLDeadCodeElimination >> clean [
 
 	currentMethod nodesDo: [ :n |
-		(markedElements anySatisfy: [ :e | n = e ]) ifFalse: [
+		((markedElements includes: n) or: [
+			 markedElementsAsExpression includes: n ]) ifFalse: [
 			n parent ifNotNil: [ :parent | parent removeUnusedNodesInBranch: n ] ] ]
 ]
 
@@ -43,90 +45,92 @@ SLDeadCodeElimination >> currentMethod: aTMethod [
 	currentMethod := aTMethod
 ]
 
-{ #category : 'dead-code-elimination' }
+{ #category : 'init-mark-and-worklist' }
 SLDeadCodeElimination >> initMarkAndWorkList [
 
 	currentMethod parseTree nodesDo: [ :node |
 		node isSend ifTrue: [ self mayMarkSendNode: node ].
+
 		node isAssignment ifTrue: [ self mayMarkAssignementNode: node ].
+
 		node isReturn ifTrue: [
-			self markAndAddToWorkList: node.
-			self markAndAddToWorkList: node expression ] ]
+			self markAsStatementAndAddToWorkList: node.
+			self markAsExpressionAndAddToWorkList: node expression ].
+
+		node isGoTo ifTrue: [
+			self markAsStatementAndAddToWorkList: node.
+			self markAsStatement: node label ].
+
+		node isLabel ifTrue: [ self markAsStatementAndAddToWorkList: node ] ]
 ]
 
 { #category : 'initialization' }
 SLDeadCodeElimination >> initialize [
 
-	markedElements := Set new.
+	markedElements := IdentitySet new: 300.
+	markedElementsAsExpression := IdentitySet new: 300.
 	workList := OrderedCollection new
 ]
 
 { #category : 'mark' }
-SLDeadCodeElimination >> markAndAddToWorkList: aNode [
+SLDeadCodeElimination >> markAsExpression: aNode [
 
-	markedElements add: aNode.
-	workList add: aNode
+	markedElementsAsExpression add: aNode
 ]
 
 { #category : 'mark' }
-SLDeadCodeElimination >> markAssignmentNode: anAssignmentNode [
-	"mark the node and expresssion, assume the lvalue is already marked"
+SLDeadCodeElimination >> markAsExpressionAndAddToWorkList: aNode [
 
-	(markedElements includes: anAssignmentNode) ifTrue: [ ^ self ].
-	self markAndAddToWorkList: anAssignmentNode.
-	self markAndAddToWorkList: anAssignmentNode expression
+	(markedElementsAsExpression includes: aNode) ifFalse: [
+		workList add: aNode ].
+	self markAsExpression: aNode
 ]
 
 { #category : 'mark' }
-SLDeadCodeElimination >> markSendNode: aSendNode [
+SLDeadCodeElimination >> markAsStatement: aNode [
 
-	markedElements add: aSendNode.
-	self markAndAddToWorkList: aSendNode receiver.
-
-	aSendNode arguments do: [ :arg | self markAndAddToWorkList: arg ]
+	markedElements add: aNode
 ]
 
 { #category : 'mark' }
-SLDeadCodeElimination >> markSwitchStatementNode: aSwitchStatementNode [
+SLDeadCodeElimination >> markAsStatementAndAddToWorkList: aNode [
 
-	markedElements add: aSwitchStatementNode
+	(markedElements includes: aNode) ifFalse: [
+		workList add: aNode ].
+	self markAsStatement: aNode
 ]
 
-{ #category : 'dead-code-elimination' }
+{ #category : 'init-mark-and-worklist' }
 SLDeadCodeElimination >> mayMarkAssignementNode: anAssignmentNode [
 
 	| variable |
 	variable := anAssignmentNode variable.
 	(currentMethod locals includes: variable name) ifTrue: [ ^ self ].
-	self markAndAddToWorkList: variable.
-	self markAssignmentNode: anAssignmentNode
+	self visitAssignmentNode: anAssignmentNode
 ]
 
-{ #category : 'dead-code-elimination' }
+{ #category : 'init-mark-and-worklist' }
 SLDeadCodeElimination >> mayMarkSendNode: aSendNode [
 
 	(aSendNode hasSideEffect not or: [
 		 aSendNode isSelectorWithNoSideEffect ]) ifTrue: [ ^ self ].
-	self markSendNode: aSendNode
+	self visitSendNode: aSendNode
 ]
 
 { #category : 'mark' }
 SLDeadCodeElimination >> propagateMarkedElement: node [
-	"if a node has been marked useful, mark its children and parent and add them to the workList "
+	"if a node has been marked useful, mark its dependences and add them to the workList via a visitor pattern, behavior may change if we are marked as an expression or not "
 
 	| parent |
-	node isSend ifTrue: [ self markSendNode: node ].
-
-	node isVariable ifTrue: [
-		currentMethod nodesDo: [ :n |
-			(n isAssignment and: [ n variable isSameAs: node ]) ifTrue: [
-				self markAssignmentNode: n ] ] ].
-
-	node isSwitch ifTrue: [ self markSwitchStatementNode: node ].
+	
+	self visit: node.
 
 	parent := node parent.
-	((markedElements includes: parent) or: [parent isTMethod or: [ parent isNil ]]) ifFalse: [
-		self markAndAddToWorkList: parent ]
+	(parent isNil or: [
+		 parent isTMethod or: [
+			 (markedElements includes: parent) or: [
+				 markedElementsAsExpression includes: parent ] ] ]) ifFalse: [
+		self markAsStatementAndAddToWorkList: parent ]
 ]
 
 { #category : 'dead-code-elimination' }
@@ -135,21 +139,137 @@ SLDeadCodeElimination >> removeDeadCodeInCurrentMethod [
 	| i |
 	self initMarkAndWorkList.
 	[ workList isEmpty ] whileFalse: [
-		i := workList at: 1.
-		workList remove: i.
+		i := workList removeFirst.
 		self propagateMarkedElement: i ].
 	self clean.
-	currentMethod := nil.
-	markedElements := Set new.
-	workList := OrderedCollection new
+	self initialize
 ]
 
 { #category : 'dead-code-elimination' }
 SLDeadCodeElimination >> removeDeadCodeUsing: aCodeGen [
 
 	codeGenerator := aCodeGen.
-	codeGenerator methods do: [ :m |
-		currentMethod := m.
-		codeGenerator currentMethod: m.
-		self removeDeadCodeInCurrentMethod ]
+	UIManager default
+		displayProgress: 'dead code elimation'
+		from: 0
+		to: codeGenerator methods size
+		during: [ :bar |
+			codeGenerator methods doWithIndex: [ :m :i |
+				bar value: i.
+				currentMethod := m.
+				codeGenerator currentMethod: m.
+				self removeDeadCodeInCurrentMethod ] ]
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visit: aNode [
+
+	aNode accept: self
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitAssignmentNode: anAssignmentNode [
+
+	self markAsStatementAndAddToWorkList: anAssignmentNode.
+	self markAsExpressionAndAddToWorkList: anAssignmentNode variable.
+	self markAsExpressionAndAddToWorkList: anAssignmentNode expression
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitCaseStatementNode: aCaseStmtNode [
+
+	self markAsStatement: aCaseStmtNode.
+	self markAsExpressionAndAddToWorkList: aCaseStmtNode expression.
+
+	aCaseStmtNode cases do: [ :case |
+		self markAsExpressionAndAddToWorkList: case ]
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitConstantNode: aConstantNode [
+	"nothing to do for an already marked constant"
+
+	
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitGoToNode: aTGotoNode [
+	"nothing to do for an already marked TGotToNode"
+
+	
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitInlineNode: anInlineNode [
+
+	self markAsStatement: anInlineNode.
+	(markedElementsAsExpression includes: self) ifTrue: [
+		self markAsExpressionAndAddToWorkList: anInlineNode method parseTree ]
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitLabeledCommentNode: aLabeledCommentNode [
+	"nothing to do for an already marked label or comment"
+
+	
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitReturnNode: aReturnNode [
+	"should't be called : return are handled in the first pass of the algorithm"
+
+	
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitSendNode: aSendNode [
+
+	self markAsStatementAndAddToWorkList: aSendNode.
+	self markAsExpressionAndAddToWorkList: aSendNode receiver.
+
+	aSendNode arguments do: [ :arg |
+		self markAsExpressionAndAddToWorkList: arg ]
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitStatementListNode: aStatementsListNode [
+	"node statements are either marked from a children, for example [ 5.self method.true ] then we don't need to do anythings since the node and the useful branch(es) are already being marked.
+	When it is marked from a parent (as expression), for example ^ [ 5.self method.true ] or ^ [ 5 ], in this case to keep the correct behavior, the last expression is kept."
+
+	| statements |
+	statements := aStatementsListNode statements.
+	((markedElementsAsExpression includes: aStatementsListNode) and: [
+		 aStatementsListNode isEmptyStmtListNode not ]) ifTrue: [
+		self markAsExpressionAndAddToWorkList:
+			aStatementsListNode lastNonCommentStatement ].
+	statements do: [ :n | "keep the comments"
+		n isComment ifTrue: [ self markAsStatement: n ] ]
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitSwitchStatementNode: aSwitchStatementNode [
+
+	self markAsStatement: aSwitchStatementNode.
+	self markAsExpressionAndAddToWorkList:
+		aSwitchStatementNode expression.
+
+	aSwitchStatementNode cases do: [ :c |
+		| caseLabels caseStatements |
+		caseLabels := c first.
+		caseStatements := c second.
+		caseLabels do: [ :label |
+			self markAsExpressionAndAddToWorkList: label ].
+		self markAsExpressionAndAddToWorkList: caseStatements ].
+
+	aSwitchStatementNode otherwiseOrNil ifNotNil: [
+		self markAsExpressionAndAddToWorkList:
+			aSwitchStatementNode otherwiseOrNil ]
+]
+
+{ #category : 'mark' }
+SLDeadCodeElimination >> visitVariableNode: aVariableNode [
+
+	currentMethod nodesDo: [ :n |
+		(n isAssignment and: [ n variable isSameAs: aVariableNode ])
+			ifTrue: [ self visitAssignmentNode: n ] ]
 ]
