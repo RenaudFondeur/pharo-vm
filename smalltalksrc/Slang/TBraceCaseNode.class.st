@@ -79,6 +79,12 @@ TBraceCaseNode >> cases: anObject [
 	cases do: [ :e | e parent: self ]
 ]
 
+{ #category : 'accessing' }
+TBraceCaseNode >> children [
+
+	^ self caseLabels , self cases
+]
+
 { #category : 'enumerating' }
 TBraceCaseNode >> nodesDo: aBlock [
 	"Apply aBlock to all nodes in the receiver.

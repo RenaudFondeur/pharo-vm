@@ -115,9 +115,10 @@ TConstantNode >> nodesDo: aBlock parent: parent [
 
 { #category : 'printing' }
 TConstantNode >> printOn: aStream level: level [
+
 	value isSymbol
-		ifTrue: [aStream nextPutAll: (value copyWithout: $:)]
-		ifFalse: [value storeOn: aStream]
+		ifTrue: [ aStream nextPutAll: (value copyWithout: $:) ]
+		ifFalse: [ value storeOn: aStream ]
 ]
 
 { #category : 'accessing' }

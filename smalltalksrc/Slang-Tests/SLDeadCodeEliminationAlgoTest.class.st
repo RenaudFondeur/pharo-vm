@@ -18,6 +18,106 @@ SLDeadCodeEliminationAlgoTest >> astTranslate: tast inStream: aWriteStream [
 	cAST acceptVisitor: prettyPrinter.
 ]
 
+{ #category : 'debug' }
+SLDeadCodeEliminationAlgoTest >> testInlineInSwitchRemovesReturnStatement [
+
+	| method codeGenerator methodToBeInlined translation |
+	method := (Spur64BitMemoryManager lookupSelector:
+		           #numSlotsForShortening:toIndexableSize:)
+		          asTranslationMethodOfClass: TMethod.
+	methodToBeInlined := (Spur64BitMemoryManager lookupSelector:
+		                      #arrayFormat) asTranslationMethodOfClass:
+		                     TMethod.
+
+	codeGenerator := CCodeGeneratorGlobalStructure new.
+	codeGenerator addMethod: method.
+	codeGenerator addMethod: methodToBeInlined.
+	codeGenerator prepareMethods.
+	codeGenerator inferTypes.
+	codeGenerator doInlining: true.
+	
+	sLDeadCodeElimination currentMethod: method.
+	ccg currentMethod: method.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	method removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: method.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals: '/* Spur64BitMemoryManager>>#numSlotsForShortening:toIndexableSize: */
+static sqInt
+numSlotsForShorteningtoIndexableSize(sqInt objOop, sqInt indexableSize)
+{
+	switch (formatOf(objOop)) {
+		case 2:
+		{
+			return indexableSize;
+		}
+		case firstLongFormat():
+		case (firstLongFormat()) + 1:
+		{
+			return numSlotsForBytes(indexableSize * 4);
+		}
+		default:
+		error("Case not found and no otherwise clause");
+		return -1;
+	}
+}'
+]
+
+{ #category : 'debug' }
+SLDeadCodeEliminationAlgoTest >> testIsValidObjStackPageMyIndex [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #isValidObjStackPage:myIndex:.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/*	Just check the page itself. */
+/* SLDeadCodeEliminationAlgoTestClass>>#isValidObjStackPage:myIndex: */
+static sqInt
+isValidObjStackPagemyIndex(sqInt objStackPage, sqInt myx)
+{
+	sqInt marking;
+	sqInt ObjStackMyx;
+	sqInt ObjStackPageSlots;
+
+	ObjStackMyx = 0;
+	ObjStackPageSlots = 0;
+	marking = 0;
+	if (!((classIndexOf(objStackPage)) == (wordSizeClassIndexPun()))) {
+		return 0;
+	}
+	if (!((formatOf(objStackPage)) == (wordIndexableFormat()))) {
+		return 0;
+	}
+	if (!((numSlotsOfAny(objStackPage)) == ObjStackPageSlots)) {
+		return 0;
+	}
+	if (!(myx == (fetchPointerofObject(ObjStackMyx, objStackPage)))) {
+		return 0;
+	}
+	if (marking && (!(isMarked(objStackPage)))) {
+		return 0;
+	}
+	return 1;
+}'
+]
+
 { #category : 'useless-switch' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithEmptyCaseOfSendInReceiver [
 
@@ -136,6 +236,42 @@ methodWithUselessAssignment(void)
 	i = 5;
 	j = i;
 	return j;
+}'
+]
+
+{ #category : 'useless-assignment' }
+SLDeadCodeEliminationAlgoTest >> testPopThenPushBool [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #pop:thenPushBool:.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#pop:thenPushBool: */
+static sqInt
+popthenPushBool(sqInt nItems, sqInt boolean)
+{
+	sqInt falseObj;
+	sqInt trueObj;
+
+	falseObj = 0;
+	trueObj = 0;
+	pop(nItems);
+	push(((boolean)
+		 ? trueObj
+		 : falseObj));
+	return 0;
 }'
 ]
 

@@ -603,7 +603,7 @@ TSendNode >> removeUnusedNodesInBranch: aChild [
 
 	| branchIndex |
 	branchIndex := arguments indexOf: aChild.
-	arguments := arguments select: [ :e | e ~= aChild ].
+	self arguments: (arguments select: [ :e | e ~= aChild ]).
 	self argumentsIsEmptyOrHasNothingButComments
 		ifTrue: [
 			self transformReceiverAfterEmptyArguments.

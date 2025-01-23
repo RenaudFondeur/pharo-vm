@@ -83,7 +83,8 @@ TStatementListNode >> addAllLast: aListOfStatement [
 						allWithoutEndComment add: e.
 						actualLastMet := e == actualLast ]
 					ifTrue: [ endComment add: e ] ].
-			statements := allWithoutEndComment , aListOfStatement , endComment ]
+			self statements:
+				allWithoutEndComment , aListOfStatement , endComment ]
 ]
 
 { #category : 'declarations' }
@@ -366,9 +367,12 @@ TStatementListNode >> copyWithoutReturn [
 
 	| newStmtsListNode |
 	self assert: self endsWithReturn.
+
 	statements size = 1 ifTrue: [
-		statements last parent: self parent.
-		^ statements last copyWithoutReturn ].
+		^ statements last copyWithoutReturn
+			  parent: self parent;
+			  yourself ].
+
 	newStmtsListNode := self class new setArguments: arguments.
 	statements last isComment
 		ifFalse: [
@@ -608,20 +612,21 @@ TStatementListNode >> removeAssertions [
 TStatementListNode >> removeLast [
 	"the last statement can be a comment if the TStatementList has been through inlining, remove the actual last statement"
 
-	statements := self allButLastNonCommentStatement
+	self statements: self allButLastNonCommentStatement
 ]
 
 { #category : 'dead-code-elimination' }
 TStatementListNode >> removeUnusedNodesInBranch: aChild [
 	"this method should be only called when cleaning an AST tree after an unused expression was found, remove aChild from the list of statements"
 
-	statements := statements select: [ :stmt | stmt ~~ aChild ].
+	self statements: (statements select: [ :stmt | stmt ~~ aChild ]).
 	self isEmptyOrHasNothingButComments ifTrue: [
 		self parent removeUnusedNodesInBranch: self ].
 	(statements size = 1 and: [
-		 self parent isTMethod not and: [
-			 self parent isSend and: [
-				 self parent isUnaryIterativeSendWithImportantLastStatement ] ] ])
+		 self parent isNotNil and: [
+			 self parent isTMethod not and: [
+				 self parent isSend and: [
+					 self parent isUnaryIterativeSendWithImportantLastStatement ] ] ] ])
 		ifTrue: [ self parent removeUnusedNodesInBranch: self ]
 ]
 
@@ -685,7 +690,7 @@ TStatementListNode >> replaceChild: aNode withList: aListOfStatement [
 				aNodeMet := e == aNode.
 				aNodeMet ifFalse: [ allWithoutANode add: e ] ]
 			ifTrue: [ endWithoutANode add: e ] ].
-	statements := allWithoutANode , aListOfStatement , endWithoutANode
+	self statements: allWithoutANode , aListOfStatement , endWithoutANode
 ]
 
 { #category : 'transformations' }
