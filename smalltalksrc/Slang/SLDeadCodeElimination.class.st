@@ -6,11 +6,24 @@ Class {
 		'workList',
 		'markedElements',
 		'markedElementsAsExpression',
-		'currentMethod'
+		'currentMethod',
+		'variableOccurences'
 	],
 	#category : 'Slang',
 	#package : 'Slang'
 }
+
+{ #category : 'init-mark-and-worklist' }
+SLDeadCodeElimination >> addOcurrencesFor: aTVariableNode [
+
+	| varName |
+	varName := aTVariableNode name.
+	variableOccurences
+		at: varName
+		ifPresent: [
+		variableOccurences at: varName update: [ :counter | counter + 1 ] ]
+		ifAbsent: [ variableOccurences at: varName put: 1 ]
+]
 
 { #category : 'cleaning' }
 SLDeadCodeElimination >> clean [
@@ -18,7 +31,18 @@ SLDeadCodeElimination >> clean [
 	currentMethod nodesDo: [ :n |
 		((markedElements includes: n) or: [
 			 markedElementsAsExpression includes: n ]) ifFalse: [
-			n parent ifNotNil: [ :parent | parent removeUnusedNodesInBranch: n ] ] ]
+			n isVariable ifTrue: [ self decreaseVariableOcurencesFor: n ].
+			n parent ifNotNil: [ :parent | parent removeUnusedNodesInBranch: n ] ] ].
+	self cleanUnusedVariableDeclaration.
+]
+
+{ #category : 'cleaning' }
+SLDeadCodeElimination >> cleanUnusedVariableDeclaration [
+
+	variableOccurences keysDo: [ :varName |
+		(variableOccurences at: varName) <= 0 ifTrue: [
+			(currentMethod locals includes: varName) ifTrue: [
+				currentMethod removeLocal: varName ] ] ]
 ]
 
 { #category : 'accessing' }
@@ -45,8 +69,22 @@ SLDeadCodeElimination >> currentMethod: aTMethod [
 	currentMethod := aTMethod
 ]
 
+{ #category : 'cleaning' }
+SLDeadCodeElimination >> decreaseVariableOcurencesFor: aTVariableNode [
+
+	| varName |
+	varName := aTVariableNode name.
+	variableOccurences at: varName update: [ :counter | counter - 1 ].
+	(variableOccurences at: varName) = 0 ifTrue: [
+		(currentMethod locals includes: aTVariableNode name) ifTrue: [
+			currentMethod removeLocal: aTVariableNode name ] ]
+]
+
 { #category : 'init-mark-and-worklist' }
 SLDeadCodeElimination >> initMarkAndWorkList [
+
+	currentMethod locals do: [ :varName |
+		variableOccurences at: varName put: 0 ].
 
 	currentMethod parseTree nodesDo: [ :node |
 		node isSend ifTrue: [ self mayMarkSendNode: node ].
@@ -61,7 +99,9 @@ SLDeadCodeElimination >> initMarkAndWorkList [
 			self markAsStatementAndAddToWorkList: node.
 			self markAsStatement: node label ].
 
-		node isLabel ifTrue: [ self markAsStatementAndAddToWorkList: node ] ]
+		node isLabel ifTrue: [ self markAsStatementAndAddToWorkList: node ].
+
+		node isVariable ifTrue: [ self addOcurrencesFor: node ] ]
 ]
 
 { #category : 'initialization' }
@@ -69,7 +109,8 @@ SLDeadCodeElimination >> initialize [
 
 	markedElements := IdentitySet new: 300.
 	markedElementsAsExpression := IdentitySet new: 300.
-	workList := OrderedCollection new
+	workList := OrderedCollection new.
+	variableOccurences := Dictionary new: 100
 ]
 
 { #category : 'mark' }
@@ -98,6 +139,14 @@ SLDeadCodeElimination >> markAsStatementAndAddToWorkList: aNode [
 	(markedElements includes: aNode) ifFalse: [
 		workList add: aNode ].
 	self markAsStatement: aNode
+]
+
+{ #category : 'cleaning' }
+SLDeadCodeElimination >> mayCleanVariable: aTVariableNode [
+
+	| varName |
+	varName := aTVariableNode name.
+	variableOccurences at: varName update: [ :counter | counter - 1 ]
 ]
 
 { #category : 'init-mark-and-worklist' }
