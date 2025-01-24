@@ -187,6 +187,65 @@ methodWithEmptyCaseOfSendInReceiver(void)
 }'
 ]
 
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocals [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithNeverUsedLocals.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithNeverUsedLocals */
+static sqInt
+methodWithNeverUsedLocals(void)
+{
+	int var5;
+	sqInt var6;
+
+	var5 = 6;
+	var6 = var5;
+	return var6;
+}'
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithOnlyNeverUsedLocals [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithOnlyNeverUsedLocals.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithOnlyNeverUsedLocals */
+static sqInt
+methodWithOnlyNeverUsedLocals(void)
+{
+	return 0;
+}'
+]
+
 { #category : 'useless-assignment' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithOnlyUselessAssignment [
 

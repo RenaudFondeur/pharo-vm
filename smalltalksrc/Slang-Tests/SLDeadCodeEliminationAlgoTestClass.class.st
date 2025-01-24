@@ -70,6 +70,29 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithEmptyCaseOfSendInReceiver [
 			([ 6 ] -> [  ]) }
 ]
 
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocals [
+
+	| var1 var2 var3 var4 var5 var6 |
+	var1.
+	var2 := var1.
+	var3 := var4.
+	var4 := 5.
+	var5 := 6.
+	var6 := var5.
+	^ var6
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithOnlyNeverUsedLocals [
+
+	| var1 var2 var3 var4 |
+	var1.
+	var2 := var1.
+	var3 := var4.
+	var4 := 5
+]
+
 { #category : 'useless-assignment' }
 SLDeadCodeEliminationAlgoTestClass >> methodWithOnlyUselessAssignment [
 
