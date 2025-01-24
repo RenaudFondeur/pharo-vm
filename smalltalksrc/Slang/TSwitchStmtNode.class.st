@@ -289,9 +289,6 @@ TSwitchStmtNode >> createCasesFromBraceNode: aTBraceNode [
 						(labels collect: [ :ea | ea statements first ]).
 						case }.
 				case parent: self ] ].
-	self haltIf: [
-		aTBraceNode tMethod isNotNil and: [
-			aTBraceNode tMethod selector = #noteFollowingConditionalBranch: ] ].
 	^ newCases
 ]
 
