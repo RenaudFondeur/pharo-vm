@@ -118,6 +118,38 @@ isValidObjStackPagemyIndex(sqInt objStackPage, sqInt myx)
 }'
 ]
 
+{ #category : 'useless-assignment' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithCCoerceInExpression [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithCCoerceInExpression.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+	ccg doBasicInlining: true.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithCCoerceInExpression */
+static sqInt
+methodWithCCoerceInExpression(void)
+{
+	int i;
+
+	i = 8;
+	((char *) i );
+	return i + 5;
+}'
+]
+
 { #category : 'useless-switch' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithEmptyCaseOfSendInReceiver [
 

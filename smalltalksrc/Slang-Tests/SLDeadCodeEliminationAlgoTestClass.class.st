@@ -36,6 +36,12 @@ SLDeadCodeEliminationAlgoTestClass >> isValidObjStackPage: objStackPage myIndex:
 	^ true
 ]
 
+{ #category : 'debug' }
+SLDeadCodeEliminationAlgoTestClass >> methReturnInt [
+	
+	^ 5
+]
+
 { #category : 'helpers' }
 SLDeadCodeEliminationAlgoTestClass >> method [
 
@@ -44,6 +50,15 @@ SLDeadCodeEliminationAlgoTestClass >> method [
 
 { #category : 'helpers' }
 SLDeadCodeEliminationAlgoTestClass >> method: arg [
+]
+
+{ #category : 'debug' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithCCoerceInExpression [
+
+	<var: #i type: #'char *'>
+	| i |
+	i := self methReturnInt.
+	^ i
 ]
 
 { #category : 'useless-switch' }
