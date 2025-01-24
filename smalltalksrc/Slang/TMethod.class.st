@@ -3204,7 +3204,7 @@ TMethod >> transformToStructClassMethodFor: aCCodeGenerator [
 					at: node
 					put: (TSendNode new
 							setSelector: node name asSymbol
-							receiver: selfNode
+							receiver: selfNode copy
 							arguments: #())]]].
 	replacements notEmpty ifTrue:
 		[self replaceNodesIn: replacements].
