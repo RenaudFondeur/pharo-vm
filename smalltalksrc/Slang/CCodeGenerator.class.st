@@ -2814,7 +2814,7 @@ CCodeGenerator >> generateCASTToByDo: tast [
 			 lvalue: (CIdentifierNode name: iterationVar)
 			 rvalue: (tast receiver asCASTExpressionIn: self)).
 	self noteUsedVariableName: iterationVar.
-	mayHaveSideEffects := tast arguments size = 4.
+	mayHaveSideEffects := tast arguments size = 5.
 	mayHaveSideEffects ifTrue: [ 
 		limitVar := tast arguments last.
 		inits add: (CAssignmentNode
@@ -2868,6 +2868,7 @@ CCodeGenerator >> generateCASTToByDoUntil: limitExpr iterativeVariable: itVar ne
 CCodeGenerator >> generateCASTToDo: tast [
 
 	| iterationVar init until step |
+	self halt.
 	tast arguments last arguments size = 1 ifFalse: [ 
 		self error: 'wrong number of block arguments' ].
 	iterationVar := tast arguments last arguments first.
@@ -2927,6 +2928,7 @@ CCodeGenerator >> generateCASTValue: tast [
 	 to body with formals substituted for by actuals."
 
 	| substitution substitutionDict newLabels castStatements |
+	self halt.
 	self assert: tast receiver isStatementList.
 	self assert: tast receiver arguments size = tast arguments size.
 	castStatements := CCompoundStatementNode statements:
@@ -2966,6 +2968,7 @@ CCodeGenerator >> generateCASTValueAsArgument: tast [
 	 to body with formals substituted for by actuals."
 
 	| substitution substitutionDict newLabels |
+	self halt.
 	self assert: tast receiver isStatementList.
 	self assert: tast receiver arguments size = tast arguments size.
 	substitution := tast receiver copy.

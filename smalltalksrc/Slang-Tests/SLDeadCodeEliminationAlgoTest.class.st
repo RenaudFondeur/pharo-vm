@@ -225,7 +225,6 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlock [
 	| translation tMethod |
 	tMethod := ccg methodNamed: #methodWithNeverUsedLocalsFromBlock.
 	tMethod prepareMethodIn: ccg.
-	tMethod expandValueSend.
 
 	sLDeadCodeElimination currentMethod: tMethod.
 	ccg currentMethod: tMethod.
@@ -258,7 +257,6 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlockWithExpre
 	tMethod := ccg methodNamed:
 		           #methodWithNeverUsedLocalsFromBlockWithExpressionInArguments.
 	tMethod prepareMethodIn: ccg.
-	tMethod expandValueSend.
 
 	sLDeadCodeElimination currentMethod: tMethod.
 	ccg currentMethod: tMethod.
@@ -324,7 +322,6 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlocktatement 
 	tMethod := ccg methodNamed:
 		           #methodWithNeverUsedLocalsFromBlockStatement.
 	tMethod prepareMethodIn: ccg.
-	tMethod expandValueSend.
 
 	sLDeadCodeElimination currentMethod: tMethod.
 	ccg currentMethod: tMethod.
@@ -461,6 +458,108 @@ methodWithUselessAssignment(void)
 	i = 5;
 	j = i;
 	return j;
+}'
+]
+
+{ #category : 'useless-code-binary-iterative' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithUselessCodeInBinaryIterativeNoSendInLimit [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUselessCodeInBinaryIterativeNoSendInLimit.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithUselessCodeInBinaryIterativeNoSendInLimit */
+static sqInt
+methodWithUselessCodeInBinaryIterativeNoSendInLimit(void)
+{
+	sqInt i;
+	int var1;
+
+	var1 = 0;
+	for (i = 2; i <= 5; i += 1) {
+		var1 += 1;
+	};
+	return var1;
+}'
+]
+
+{ #category : 'useless-code-binary-iterative' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit [
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit */
+static sqInt
+methodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit(void)
+{
+	sqInt i;
+	int var1;
+
+	var1 = 0;
+	for (i = 2; i <= (5 + 5); i += 1) {
+		var1 += 1;
+	};
+	return var1;
+}'
+]
+
+{ #category : 'useless-code-binary-iterative' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit [
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit */
+static sqInt
+methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit(void)
+{
+	sqInt i;
+	sqInt iLimit;
+	int var1;
+
+	iLimit = 0;
+	var1 = 0;
+	for (i = 2, iLimit = method(); i <= iLimit; i += 1) {
+		var1 += 1;
+	};
+	return var1;
 }'
 ]
 

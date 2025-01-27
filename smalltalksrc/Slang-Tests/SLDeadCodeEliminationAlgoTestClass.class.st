@@ -167,6 +167,50 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithUselessAssignment [
 	^ j
 ]
 
+{ #category : 'useless-code-binary-iterative' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithUselessCodeInBinaryIterative [
+
+	| var1 var2 |
+	var1 := 0.
+	2 to: 5 + 5 do: [ :i |
+		var2.
+		var1 := var1 + 1 ].
+	^ var1
+]
+
+{ #category : 'useless-code-binary-iterative' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithUselessCodeInBinaryIterativeNoSendInLimit [
+
+	| var1 var2 |
+	var1 := 0.
+	2 to: 5 do: [ :i |
+		var2.
+		var1 := var1 + 1 ].
+	^ var1
+]
+
+{ #category : 'useless-code-binary-iterative' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit [
+
+	| var1 var2 |
+	var1 := 0.
+	2 to: 5 + 5 do: [ :i |
+		var2.
+		var1 := var1 + 1 ].
+	^ var1
+]
+
+{ #category : 'useless-code-binary-iterative' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit [
+
+	| var1 var2 |
+	var1 := 0.
+	2 to: self method do: [ :i |
+		var2.
+		var1 := var1 + 1 ].
+	^ var1
+]
+
 { #category : 'debug' }
 SLDeadCodeEliminationAlgoTestClass >> pop: nItems thenPushBool: boolean [
 

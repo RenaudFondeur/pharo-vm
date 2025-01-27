@@ -33,7 +33,7 @@ SLDeadCodeElimination >> clean [
 			 markedElementsAsExpression includes: n ]) ifFalse: [
 			n isVariable ifTrue: [ self decreaseVariableOcurencesFor: n ].
 			n parent ifNotNil: [ :parent | parent removeUnusedNodesInBranch: n ] ] ].
-	self cleanUnusedVariableDeclaration.
+	self cleanUnusedVariableDeclaration
 ]
 
 { #category : 'cleaning' }
@@ -187,6 +187,7 @@ SLDeadCodeElimination >> propagateMarkedElement: node [
 SLDeadCodeElimination >> removeDeadCodeInCurrentMethod [
 
 	| i |
+	currentMethod expandValueSend.
 	self initMarkAndWorkList.
 	[ workList isEmpty ] whileFalse: [
 		i := workList removeFirst.
@@ -208,7 +209,6 @@ SLDeadCodeElimination >> removeDeadCodeUsing: aCodeGen [
 				bar value: i.
 				currentMethod := m.
 				codeGenerator currentMethod: m.
-				m expandValueSend.
 				self removeDeadCodeInCurrentMethod ] ]
 ]
 

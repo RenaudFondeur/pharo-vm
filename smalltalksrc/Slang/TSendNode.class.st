@@ -355,12 +355,11 @@ TSendNode >> expandValueSend [
 	"Reduce [:formal ... :formalN| body ] value: actual ... value: actualN
 	 to body with formals substituted for by actuals."
 
-	| substitution substitutionDict newLabels |
+	| substitution substitutionDict |
 	self assert: self receiver isStatementList.
 	self assert: self receiver arguments size = self arguments size.
 
 	substitution := self receiver copy.
-	"	substitution renameLabelsForInliningInto: self currentMethod."
 	substitutionDict := Dictionary new: self arguments size * 2.
 	self receiver arguments
 		with: self arguments
@@ -374,14 +373,6 @@ TSendNode >> expandValueSend [
 					"self noteUsedVariableName: argName ?" ] ].
 	substitution bindVariablesIn: substitutionDict.
 	substitution setArguments: #(  ). "no more parameters"
-
-	"newLabels := Set withAll: self currentMethod labels.
-	substitution nodesDo: [ :node |
-		node isLabel ifTrue: [
-			node label ifNotNil: [ :label | newLabels add: label ] ] ].
-	""now add the new labels so that a subsequent inline of
-	 the same block will be renamed with different labels.""
-	self currentMethod labels: newLabels."
 	parent replaceChild: self with: substitution
 ]
 
