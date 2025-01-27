@@ -2883,24 +2883,28 @@ TMethod >> setSelector: sel definingClass: class args: argList locals: localList
 	| tempParseTree |
 	selector := sel.
 	definingClass := class.
-	args := argList asOrderedCollection collect: [:arg | arg name].
+	args := argList asOrderedCollection collect: [ :arg | arg name ].
 	declarations := Dictionary new.
 	
 	primitive := aNumber.
 	properties := methodProperties.
 	comment := aComment.
 	labels := Set new.
-	
+
 	"hack; allows nodes to find their parent, compute the conflicting locals when inlinign super sends..."
 	self parseTree: TStatementListNode new.
 	tempParseTree := parseTree.
-	self locals: tempParseTree locals, (localList  collect: [:arg | arg name]).
+
+	self locals:
+		tempParseTree locals , (localList collect: [ :arg | arg name ]).
 
 	self parseTree: (aBlockNode asTranslatorNodeIn: self).
-	self locals: tempParseTree locals, (localList  collect: [:arg | arg name]).
+	self locals:
+		(tempParseTree locals , (localList collect: [ :arg | arg name ]))
+			asSet.
 	self addTypeForSelf.
-	
-	complete := false.  "set to true when all possible inlining has been done"
+
+	complete := false. "set to true when all possible inlining has been done"
 	export := self extractExportDirective.
 	static := self extractStaticDirective.
 	self extractSharedCase.

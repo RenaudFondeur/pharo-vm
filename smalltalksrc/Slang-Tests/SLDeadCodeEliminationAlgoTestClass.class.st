@@ -84,6 +84,15 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocals [
 ]
 
 { #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocalsFromBlock [
+
+	| var1 |
+	var1 := 5.
+	var1 := [ :arg1 | arg1 + 1 ] value: var1.
+	^ var1
+]
+
+{ #category : 'never-used-locals' }
 SLDeadCodeEliminationAlgoTestClass >> methodWithOnlyNeverUsedLocals [
 
 	| var1 var2 var3 var4 |

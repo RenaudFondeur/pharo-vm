@@ -220,6 +220,40 @@ methodWithNeverUsedLocals(void)
 ]
 
 { #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlock [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithNeverUsedLocalsFromBlock.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithNeverUsedLocalsFromBlock */
+static sqInt
+methodWithNeverUsedLocalsFromBlock(void)
+{
+	sqInt arg1;
+	int var1;
+
+	var1 = 5;
+	{
+		var1 += 1;
+	}
+	return var1;
+}'
+]
+
+{ #category : 'never-used-locals' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithOnlyNeverUsedLocals [
 
 	| translation tMethod |
