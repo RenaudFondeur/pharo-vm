@@ -70,7 +70,7 @@ TStatementListNode >> accept: aVisitor [
 TStatementListNode >> addAllLast: aListOfStatement [
 
 	(statements isNotEmpty and: [ statements last isComment ])
-		ifFalse: [ statements addAllLast: aListOfStatement ]
+		ifFalse: [ self statements: (statements addAllLast: aListOfStatement) ]
 		ifTrue: [
 			| actualLast actualLastMet allWithoutEndComment endComment |
 			actualLast := self lastNonCommentStatement.
@@ -92,6 +92,11 @@ TStatementListNode >> addDeclarations: aCollection [
 	
 	declarations addAll: aCollection.
 	locals addAll: aCollection keys.
+]
+
+{ #category : 'adding' }
+TStatementListNode >> addFirst: aNode [ 
+	self statements: (OrderedCollection new add: aNode ; yourself) , statements 
 ]
 
 { #category : 'utilities' }

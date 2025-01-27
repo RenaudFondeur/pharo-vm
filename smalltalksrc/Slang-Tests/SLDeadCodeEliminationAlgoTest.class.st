@@ -225,6 +225,7 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlock [
 	| translation tMethod |
 	tMethod := ccg methodNamed: #methodWithNeverUsedLocalsFromBlock.
 	tMethod prepareMethodIn: ccg.
+	tMethod expandValueSend.
 
 	sLDeadCodeElimination currentMethod: tMethod.
 	ccg currentMethod: tMethod.
@@ -242,14 +243,113 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlock [
 static sqInt
 methodWithNeverUsedLocalsFromBlock(void)
 {
-	sqInt arg1;
 	int var1;
 
 	var1 = 5;
+	var1 = var1 + 1;
+	return var1;
+}'
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlockWithExpressionInArguments [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithNeverUsedLocalsFromBlockWithExpressionInArguments.
+	tMethod prepareMethodIn: ccg.
+	tMethod expandValueSend.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithNeverUsedLocalsFromBlockWithExpressionInArguments */
+static sqInt
+methodWithNeverUsedLocalsFromBlockWithExpressionInArguments(void)
+{
+	sqInt arg1;
+	sqInt var1;
+
 	{
-		var1 += 1;
+		arg1 = 5 + 1;
+		var1 = arg1 + 1;
 	}
 	return var1;
+}'
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlockasArguments [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithNeverUsedLocalsFromBlockasArguments.
+	tMethod prepareMethodIn: ccg.
+	ccg doBasicInlining: true.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithNeverUsedLocalsFromBlockasArguments */
+static sqInt
+methodWithNeverUsedLocalsFromBlockasArguments(void)
+{
+	method(10 + 10);
+	return 0;
+}'
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithNeverUsedLocalsFromBlocktatement [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithNeverUsedLocalsFromBlockStatement.
+	tMethod prepareMethodIn: ccg.
+	tMethod expandValueSend.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithNeverUsedLocalsFromBlockStatement */
+static sqInt
+methodWithNeverUsedLocalsFromBlockStatement(void)
+{
+	int var1;
+	sqInt var2;
+
+	var1 = 4;
+	{
+		var2 = var1 + 1;
+	}
+	return var2;
 }'
 ]
 

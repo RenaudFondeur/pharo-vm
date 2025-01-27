@@ -1031,6 +1031,11 @@ TMethod >> exitVar: exitVar label: exitLabel [
 	^ labelUsed
 ]
 
+{ #category : 'inlining support' }
+TMethod >> expandValueSend [
+	parseTree nodesDo: [ :node | (node isSend and: [node isValueExpansion ] )ifTrue: [ node expandValueSend ] ]
+]
+
 { #category : 'accessing' }
 TMethod >> export [
 
@@ -3318,7 +3323,8 @@ TMethod >> tryToInlineMethodsIn: aCodeGen [
 	"marking a method complete is progress"
 	complete ifFalse: [
 		self checkForCompletenessIn: aCodeGen.
-		complete ifTrue: [ didSomething := true ] ]. 
+		complete ifTrue: [
+			didSomething := true ] ]. "marking a method complete is progress"
 	^ didSomething
 ]
 

@@ -162,7 +162,8 @@ SLDeadCodeElimination >> mayMarkAssignementNode: anAssignmentNode [
 SLDeadCodeElimination >> mayMarkSendNode: aSendNode [
 
 	(aSendNode hasSideEffect not or: [
-		 aSendNode isSelectorWithNoSideEffect ]) ifTrue: [ ^ self ].
+		 aSendNode isSelectorWithNoSideEffect or:
+			 aSendNode isConditionalSend ]) ifTrue: [ ^ self ].
 	self visitSendNode: aSendNode
 ]
 
@@ -199,7 +200,7 @@ SLDeadCodeElimination >> removeDeadCodeUsing: aCodeGen [
 
 	codeGenerator := aCodeGen.
 	UIManager default
-		displayProgress: 'dead code elimation'
+		displayProgress: 'dead code elimation '
 		from: 0
 		to: codeGenerator methods size
 		during: [ :bar |
@@ -207,6 +208,7 @@ SLDeadCodeElimination >> removeDeadCodeUsing: aCodeGen [
 				bar value: i.
 				currentMethod := m.
 				codeGenerator currentMethod: m.
+				m expandValueSend.
 				self removeDeadCodeInCurrentMethod ] ]
 ]
 

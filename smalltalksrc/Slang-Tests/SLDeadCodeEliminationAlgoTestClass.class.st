@@ -45,11 +45,12 @@ SLDeadCodeEliminationAlgoTestClass >> methReturnInt [
 { #category : 'helpers' }
 SLDeadCodeEliminationAlgoTestClass >> method [
 
-	
+	^ [ :arg1 | arg1 ] value: 10 + 10
 ]
 
 { #category : 'helpers' }
 SLDeadCodeEliminationAlgoTestClass >> method: arg [
+	<inline: false>
 ]
 
 { #category : 'debug' }
@@ -90,6 +91,38 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocalsFromBlock [
 	var1 := 5.
 	var1 := [ :arg1 | arg1 + 1 ] value: var1.
 	^ var1
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocalsFromBlockStatement [
+
+	| var1 var2 |
+	var1 := 4.
+	[ :arg1 | var2 := arg1 + 1 ] value: var1.
+	^ var2
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocalsFromBlockStatementWithExpressionInArguments [
+
+	| var1 var2 |
+	var1 := 4.
+	[ :arg1 | var2 := arg1 + 1 ] value: var1.
+	^ var2
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocalsFromBlockWithExpressionInArguments [
+
+	| var1 |
+	var1 := [ :arg1 | arg1 + 1 ] value: 5 + 1.
+	^ var1
+]
+
+{ #category : 'never-used-locals' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocalsFromBlockasArguments [
+
+	self method: self method
 ]
 
 { #category : 'never-used-locals' }
