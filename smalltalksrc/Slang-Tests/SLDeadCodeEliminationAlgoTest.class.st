@@ -118,6 +118,67 @@ isValidObjStackPagemyIndex(sqInt objStackPage, sqInt myx)
 }'
 ]
 
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithBlockValueAssignmentIntoSameVariableInArguments [
+	
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithBlockValueAssignmentIntoSameVariableInArguments.
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+'/*	produce a self assignation at translation time */
+/* SLDeadCodeEliminationAlgoTestClass>>#methodWithBlockValueAssignmentIntoSameVariableInArguments */
+static sqInt
+methodWithBlockValueAssignmentIntoSameVariableInArguments(void)
+{
+	sqInt var;
+
+	{
+		method(var);
+	}
+	return var;
+}'
+]
+
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithBlockValueValueAssignmentIntoSameVariableInArguments [
+	"remove var = var"
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithBlockValueValueAssignmentIntoSameVariableInArguments.
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals: '/*	produce a self assignation at translation time */
+/* SLDeadCodeEliminationAlgoTestClass>>#methodWithBlockValueValueAssignmentIntoSameVariableInArguments */
+static sqInt
+methodWithBlockValueValueAssignmentIntoSameVariableInArguments(void)
+{
+	sqInt var;
+	sqInt var2;
+
+	{
+		method(var2);
+		method(var);
+	}
+	return var;
+}'
+]
+
 { #category : 'useless-assignment' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithCCoerceInExpression [
 
@@ -350,6 +411,35 @@ methodWithNeverUsedLocalsFromBlockStatement(void)
 }'
 ]
 
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithOnlyBlockValueAssignmentIntoSameVariableInArguments [
+	"all of the body is dead code"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed:
+		           #methodWithOnlyBlockValueAssignmentIntoSameVariableInArguments.
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals: '/*	produce a self assignation at translation time */
+/* SLDeadCodeEliminationAlgoTestClass>>#methodWithOnlyBlockValueAssignmentIntoSameVariableInArguments */
+static sqInt
+methodWithOnlyBlockValueAssignmentIntoSameVariableInArguments(void)
+{
+	sqInt var;
+
+	var = 0;
+	return var;
+}'
+]
+
 { #category : 'never-used-locals' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithOnlyNeverUsedLocals [
 
@@ -400,6 +490,34 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithOnlyUselessAssignment [
 static void
 methodWithOnlyUselessAssignment(void)
 {
+}'
+]
+
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithSelfAssign [
+	"happens because of polymorphisme or inlining"
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithSelfAssign.
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithSelfAssign */
+static sqInt
+methodWithSelfAssign(void)
+{
+	sqInt var;
+
+	var = 0;
+	return var;
 }'
 ]
 

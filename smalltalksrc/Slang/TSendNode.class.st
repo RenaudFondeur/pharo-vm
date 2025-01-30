@@ -351,7 +351,7 @@ TSendNode >> endsWithReturn [
 ]
 
 { #category : 'transformations' }
-TSendNode >> expandValueSendIn: aTMethod [
+TSendNode >> expandASTIn: aTMethod [
 	"Reduce [:formal ... :formalN| body ] value: actual ... value: actualN
 	 to body with formals substituted for by actuals."
 
@@ -423,6 +423,15 @@ TSendNode >> isConditionalSend [
 TSendNode >> isDoIterativeSend [
 
 	^ #( #to:do: #to:by:do: ) includes: selector
+]
+
+{ #category : 'dead-code-elimination' }
+TSendNode >> isIterativeSend [
+
+	^ self isBinaryIterativeSend or: [
+		  self isDoIterativeSend or: [
+			  self isUnaryIterativeSend or:
+				  self isUnaryIterativeSendWithImportantLastStatement ] ]
 ]
 
 { #category : 'testing' }

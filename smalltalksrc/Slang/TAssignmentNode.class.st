@@ -93,7 +93,7 @@ TAssignmentNode >> asCASTIn: aBuilder [
 
 { #category : 'C code generation' }
 TAssignmentNode >> asCASTStatementListExpansionAsExpression: aCodeGen [
-
+	self halt.
 	(variable isSameAs: expression lastNonCommentStatement) ifTrue: [
 		^ expression asCASTExpressionIn: aCodeGen ].
 	^ expression copy
@@ -105,6 +105,7 @@ TAssignmentNode >> asCASTStatementListExpansionAsExpression: aCodeGen [
 TAssignmentNode >> asCASTValueExpansionIn: aCodeGen [
 
 	| stmtList lastStmt copy |
+	self halt.
 	"Transform assignments of the form:
 	
 	var := [ a . block . lastexpression ] value.
@@ -137,6 +138,51 @@ TAssignmentNode >> asCASTValueExpansionIn: aCodeGen [
 		   setSelector: expression selector
 		   receiver: copy
 		   arguments: expression arguments) asCASTIn: aCodeGen
+]
+
+{ #category : 'tranforming' }
+TAssignmentNode >> asStatementListExpansionAsExpression [
+
+	(variable isSameAs: expression lastNonCommentStatement) ifTrue: [
+		^ expression ].
+	^ expression copy assignLastExpressionTo: variable
+]
+
+{ #category : 'tranforming' }
+TAssignmentNode >> asValueExpansion [
+
+	| stmtList lastStmt copy |
+	"Transform assignments of the form:
+	
+	var := [ a . block . lastexpression ] value.
+	
+	into:
+	
+	[ a . block . var := lastExpression ] value.
+	
+	Takes into account variants of #value and #value:.
+	"
+	self assert: (expression isSend and: [ expression isValueExpansion ]).
+
+	stmtList := expression receiver.
+	lastStmt := stmtList lastNonCommentStatement.
+
+	"Optimization. If the expression looks like:
+	
+	var := [ ... var ] value.
+	
+	Emit directly the block without the last statement, as the assignment has no impact in the translation.
+	"
+	(variable isSameAs: lastStmt) ifTrue: [ ^ expression ].
+	copy := stmtList copy.
+	copy statements
+		at: (stmtList statements indexOf: lastStmt)
+		put:
+		(TAssignmentNode new setVariable: variable expression: lastStmt).
+	^ TSendNode new
+		  setSelector: expression selector
+		  receiver: copy
+		  arguments: expression arguments
 ]
 
 { #category : 'transformations' }
@@ -185,6 +231,20 @@ TAssignmentNode >> children [
 TAssignmentNode >> displayString [
 
 	^ ' := '
+]
+
+{ #category : 'tranforming' }
+TAssignmentNode >> expandASTIn: atMethod [
+
+	| replacement |
+	(expression isStatementList and: [ expression statements size > 1 ])
+		ifTrue: [ replacement := self asStatementListExpansionAsExpression ].
+
+	(expression isSend and: [ expression isValueExpansion ]) ifTrue: [
+		expression expandASTIn: atMethod.
+		replacement := self asStatementListExpansionAsExpression ].
+
+	replacement ifNotNil: [ parent replaceChild: self with: replacement ]
 ]
 
 { #category : 'accessing' }

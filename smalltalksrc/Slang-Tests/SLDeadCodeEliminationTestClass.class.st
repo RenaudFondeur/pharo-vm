@@ -627,7 +627,8 @@ SLDeadCodeEliminationTestClass >> methodWithSelfAssign [
 
 	<returnTypeC: #void>
 	| var |
-	var := var
+	var := var.
+	^ var
 ]
 
 { #category : 'unused-leaf' }

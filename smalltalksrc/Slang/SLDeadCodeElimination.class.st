@@ -19,12 +19,16 @@ SLDeadCodeElimination >> addDefinitionsFor: anAssignementNode [
 
 	| varName |
 	varName := anAssignementNode variable name.
+	(anAssignementNode variable isSameAs: anAssignementNode expression)
+		ifTrue: [ ^ self ].
 	variableDefinitions
 		at: varName
 		ifPresent: [
 			variableDefinitions
 				at: varName
-				put:  ((variableDefinitions at: varName) add: anAssignementNode ; yourself) ]
+				put: ((variableDefinitions at: varName)
+						 add: anAssignementNode;
+						 yourself) ]
 		ifAbsent: [
 			variableDefinitions at: varName put: (OrderedCollection new
 					 add: anAssignementNode;
@@ -98,6 +102,37 @@ SLDeadCodeElimination >> decreaseVariableOcurencesFor: aTVariableNode [
 			currentMethod removeLocal: aTVariableNode name ] ]
 ]
 
+{ #category : 'mark' }
+SLDeadCodeElimination >> handleIterativeSend: aSendNode [
+	"return true if the node is an iterative send, usefullness of iterative send depends on the statements inside, like statements nodes comportement differs"
+
+	^ false
+]
+
+{ #category : 'init-mark-and-worklist' }
+SLDeadCodeElimination >> ignoreIterativeSend: aSendNode [
+	"return true if the node has been marked, usefullness of iterative send depends on the statements inside, we can ignore them for now"
+
+	aSendNode isBinaryIterativeSend ifTrue: [
+		| receiver |
+		receiver := aSendNode receiver.
+		(receiver isStatementList and: [ receiver statements size > 1 ])
+			ifTrue: [ self markAsExpressionAndAddToWorkList: receiver ].
+		aSendNode arguments do: [ :subNode | self visit: subNode ].
+		^ true ].
+	aSendNode isDoIterativeSend ifTrue: [
+		self visit: (aSendNode arguments at: 3) ].
+	aSendNode isUnaryIterativeSend ifTrue: [
+		""
+		^ true ].
+
+	aSendNode isUnaryIterativeSendWithImportantLastStatement ifTrue: [
+		self markAsExpressionAndAddToWorkList: aSendNode receiver.
+		^ true ].
+
+	^ false
+]
+
 { #category : 'init-mark-and-worklist' }
 SLDeadCodeElimination >> initMarkAndWorkList [
 
@@ -130,6 +165,12 @@ SLDeadCodeElimination >> initialize [
 	workList := OrderedCollection new.
 	variableOccurences := Dictionary new: 100.
 	variableDefinitions := Dictionary new: 100
+]
+
+{ #category : 'testing' }
+SLDeadCodeElimination >> isStructAccessorWithNoSideEffect: aSendNode [
+
+	^ (codeGenerator isStructSend: aSendNode) and: [ aSendNode numArgs = 0 ]
 ]
 
 { #category : 'mark' }
@@ -184,7 +225,10 @@ SLDeadCodeElimination >> mayMarkSendNode: aSendNode [
 	(aSendNode hasSideEffect not or: [
 		 aSendNode isSelectorWithNoSideEffect or: [
 			 aSendNode isConditionalSend or: [
-				 aSendNode selector beginsWith: #cCoerce ] ] ]) ifTrue: [ ^ self ].
+				 aSendNode isIterativeSend or: [
+					 (self isStructAccessorWithNoSideEffect: aSendNode) or: [
+						 aSendNode selector beginsWith: #cCoerce ] ] ] ] ]) ifTrue: [
+		^ self ].
 	self visitSendNode: aSendNode
 ]
 
@@ -208,7 +252,7 @@ SLDeadCodeElimination >> propagateMarkedElement: node [
 SLDeadCodeElimination >> removeDeadCodeInCurrentMethod [
 
 	| i |
-	currentMethod expandValueSend.
+	currentMethod expandAST.
 	self initMarkAndWorkList.
 	[ workList isEmpty ] whileFalse: [
 		i := workList removeFirst.
@@ -296,6 +340,7 @@ SLDeadCodeElimination >> visitReturnNode: aReturnNode [
 { #category : 'mark' }
 SLDeadCodeElimination >> visitSendNode: aSendNode [
 
+	(self handleIterativeSend: aSendNode) ifTrue: [ ^ self ].
 	self markAsStatementAndAddToWorkList: aSendNode.
 	self markAsExpressionAndAddToWorkList: aSendNode receiver.
 

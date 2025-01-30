@@ -53,6 +53,30 @@ SLDeadCodeEliminationAlgoTestClass >> method: arg [
 	<inline: false>
 ]
 
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithBlockValueAssignmentIntoSameVariableInArguments [
+	"produce a self assignation at translation time"
+
+	| var |
+	var := [ :arg |
+	       self method: arg.
+	       arg ] value: var.
+	^ var.
+]
+
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithBlockValueValueAssignmentIntoSameVariableInArguments [
+	"produce a self assignation at translation time"
+
+	| var var2 |
+	var := [ :arg :arg2 |
+	       self method: arg.
+	       self method: arg2.
+	       arg.
+	       arg2 ] value: var2 value: var.
+	^ var
+]
+
 { #category : 'debug' }
 SLDeadCodeEliminationAlgoTestClass >> methodWithCCoerceInExpression [
 
@@ -125,6 +149,15 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithNeverUsedLocalsFromBlockasArgume
 	self method: self method
 ]
 
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithOnlyBlockValueAssignmentIntoSameVariableInArguments [
+	"produce a self assignation at translation time"
+
+	| var |
+	var := [ :arg | arg ] value: var.
+	^ var
+]
+
 { #category : 'never-used-locals' }
 SLDeadCodeEliminationAlgoTestClass >> methodWithOnlyNeverUsedLocals [
 
@@ -142,6 +175,14 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithOnlyUselessAssignment [
 	| i j |
 	i := 5.
 	j := i
+]
+
+{ #category : 'variable-assign-to-itself' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithSelfAssign [
+
+	| var |
+	var := var.
+	^ var
 ]
 
 { #category : 'useless-switch' }
