@@ -351,26 +351,33 @@ TSendNode >> endsWithReturn [
 ]
 
 { #category : 'transformations' }
-TSendNode >> expandValueSend [
+TSendNode >> expandValueSendIn: aTMethod [
 	"Reduce [:formal ... :formalN| body ] value: actual ... value: actualN
 	 to body with formals substituted for by actuals."
 
-	| substitution substitutionDict |
+	| substitution substitutionDict newLabels |
 	self assert: self receiver isStatementList.
 	self assert: self receiver arguments size = self arguments size.
 
 	substitution := self receiver copy.
+	substitution renameLabelsForInliningInto: aTMethod.
 	substitutionDict := Dictionary new: self arguments size * 2.
 	self receiver arguments
 		with: self arguments
 		do: [ :argName :exprNode |
-			(exprNode isLeaf or: [
-				 parent isSend or: [ parent isReturn ] ])
+			(exprNode isLeaf or: [ parent isSend or: [ parent isReturn ] ])
 				ifTrue: [ substitutionDict at: argName put: exprNode ]
 				ifFalse: [
 					substitution addFirst:
 						(TAssignmentNode variableNamed: argName expression: exprNode)
 					"self noteUsedVariableName: argName ?" ] ].
+	newLabels := Set withAll: aTMethod labels.
+	substitution nodesDo: [ :node |
+		node isLabel ifTrue: [
+			node label ifNotNil: [ :label | newLabels add: label ] ] ].
+	"now add the new labels so that a subsequent inline of
+	 the same block will be renamed with different labels."
+	aTMethod labels: newLabels.
 	substitution bindVariablesIn: substitutionDict.
 	substitution setArguments: #(  ). "no more parameters"
 	parent replaceChild: self with: substitution

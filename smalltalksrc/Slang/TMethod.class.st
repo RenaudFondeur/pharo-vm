@@ -1033,7 +1033,7 @@ TMethod >> exitVar: exitVar label: exitLabel [
 
 { #category : 'inlining support' }
 TMethod >> expandValueSend [
-	parseTree nodesDo: [ :node | (node isSend and: [node isValueExpansion ] )ifTrue: [ node expandValueSend ] ]
+	parseTree nodesDo: [ :node | (node isSend and: [node isValueExpansion ] )ifTrue: [ node expandValueSendIn: self ] ]
 ]
 
 { #category : 'accessing' }
