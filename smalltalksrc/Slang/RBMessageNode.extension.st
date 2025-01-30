@@ -152,7 +152,6 @@ RBMessageNode >> asTranslatorNodeIn: aTMethod [
 		args := { ((arguments at: 2) asTranslatorNodeIn: aTMethod) } ].
 	(args size > usedSelector numArgs and: [ usedSelector ~~ #to:by:do: ])
 		ifTrue: [ "prune the extra blocks left by ifTrue:, ifFalse:, and: & or:""to:by:do: has iLimiT hidden in last arg"
-			self halt.
 			self assert: args size - usedSelector numArgs = 1.
 			self assert: (args last isStatementList and: [
 					 args last statements size = 1 and: [

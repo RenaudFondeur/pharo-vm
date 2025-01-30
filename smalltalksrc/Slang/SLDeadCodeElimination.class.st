@@ -7,11 +7,29 @@ Class {
 		'markedElements',
 		'markedElementsAsExpression',
 		'currentMethod',
-		'variableOccurences'
+		'variableOccurences',
+		'variableDefinitions'
 	],
 	#category : 'Slang',
 	#package : 'Slang'
 }
+
+{ #category : 'init-mark-and-worklist' }
+SLDeadCodeElimination >> addDefinitionsFor: anAssignementNode [
+
+	| varName |
+	varName := anAssignementNode variable name.
+	variableDefinitions
+		at: varName
+		ifPresent: [
+			variableDefinitions
+				at: varName
+				put:  ((variableDefinitions at: varName) add: anAssignementNode ; yourself) ]
+		ifAbsent: [
+			variableDefinitions at: varName put: (OrderedCollection new
+					 add: anAssignementNode;
+					 yourself) ]
+]
 
 { #category : 'init-mark-and-worklist' }
 SLDeadCodeElimination >> addOcurrencesFor: aTVariableNode [
@@ -110,7 +128,8 @@ SLDeadCodeElimination >> initialize [
 	markedElements := IdentitySet new: 300.
 	markedElementsAsExpression := IdentitySet new: 300.
 	workList := OrderedCollection new.
-	variableOccurences := Dictionary new: 100
+	variableOccurences := Dictionary new: 100.
+	variableDefinitions := Dictionary new: 100
 ]
 
 { #category : 'mark' }
@@ -154,6 +173,7 @@ SLDeadCodeElimination >> mayMarkAssignementNode: anAssignmentNode [
 
 	| variable |
 	variable := anAssignmentNode variable.
+	self addDefinitionsFor: anAssignmentNode.
 	(currentMethod locals includes: variable name) ifTrue: [ ^ self ].
 	self visitAssignmentNode: anAssignmentNode
 ]
@@ -162,8 +182,9 @@ SLDeadCodeElimination >> mayMarkAssignementNode: anAssignmentNode [
 SLDeadCodeElimination >> mayMarkSendNode: aSendNode [
 
 	(aSendNode hasSideEffect not or: [
-		 aSendNode isSelectorWithNoSideEffect or:
-			 aSendNode isConditionalSend ]) ifTrue: [ ^ self ].
+		 aSendNode isSelectorWithNoSideEffect or: [
+			 aSendNode isConditionalSend or: [
+				 aSendNode selector beginsWith: #cCoerce ] ] ]) ifTrue: [ ^ self ].
 	self visitSendNode: aSendNode
 ]
 
@@ -320,7 +341,12 @@ SLDeadCodeElimination >> visitSwitchStatementNode: aSwitchStatementNode [
 { #category : 'mark' }
 SLDeadCodeElimination >> visitVariableNode: aVariableNode [
 
-	currentMethod nodesDo: [ :n |
-		(n isAssignment and: [ n variable isSameAs: aVariableNode ])
-			ifTrue: [ self visitAssignmentNode: n ] ]
+	| varName |
+	varName := aVariableNode name.
+	variableDefinitions
+		at: varName
+		ifPresent: [
+			(variableDefinitions at: varName) do: [ :definition |
+				self visit: definition ] ]
+		ifAbsent: [ "self and non-local variables" ]
 ]

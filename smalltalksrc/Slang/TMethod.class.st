@@ -935,7 +935,6 @@ TMethod >> ensureToByDoLoopLimitIsSafeAndEfficient: node in: aCodeGen [
 		ifFalse: [ "If the expression is complex but as yet there is no limit variable, add it"
 			hasSideEffects ifTrue: [ 
 				| var |
-				self halt.
 				var := self
 					       unusedNamePrefixedBy: 'toDoLimit'
 					       avoiding: self locals. "N.B. adds it to locals!!"
