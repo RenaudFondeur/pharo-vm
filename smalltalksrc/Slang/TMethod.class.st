@@ -1036,8 +1036,7 @@ TMethod >> expandAST [
 	"the order is important, expanding assignment can/will modify the value selector"
 
 	parseTree nodesDo: [ :node |
-		node isAssignment ifTrue: [ node expandASTIn: self ] ].
-	parseTree nodesDo: [ :node |
+		node isAssignment ifTrue: [ node expandASTIn: self ].
 		(node isSend and: [ node isValueExpansion ]) ifTrue: [
 			node expandASTIn: self ] ]
 ]

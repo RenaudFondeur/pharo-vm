@@ -374,8 +374,6 @@ TStatementListNode >> copyWithoutReturn [
 	self assert: self endsWithReturn.
 
 	statements size = 1 ifTrue: [
-		"necessary for checks in copyWithoutReturn"
-		statements last parent: self parent.
 		^ statements last copyWithoutReturn
 			  parent: self parent;
 			  yourself ].

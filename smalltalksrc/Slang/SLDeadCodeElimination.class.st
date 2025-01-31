@@ -96,41 +96,19 @@ SLDeadCodeElimination >> decreaseVariableOcurencesFor: aTVariableNode [
 
 	| varName |
 	varName := aTVariableNode name.
-	variableOccurences at: varName update: [ :counter | counter - 1 ].
-	(variableOccurences at: varName) = 0 ifTrue: [
-		(currentMethod locals includes: aTVariableNode name) ifTrue: [
-			currentMethod removeLocal: aTVariableNode name ] ]
+	variableOccurences at: varName update: [ :counter | counter - 1 ]
 ]
 
 { #category : 'mark' }
-SLDeadCodeElimination >> handleIterativeSend: aSendNode [
-	"return true if the node is an iterative send, usefullness of iterative send depends on the statements inside, like statements nodes comportement differs"
+SLDeadCodeElimination >> handleConditionalSend: aSendNode [
 
-	^ false
-]
-
-{ #category : 'init-mark-and-worklist' }
-SLDeadCodeElimination >> ignoreIterativeSend: aSendNode [
-	"return true if the node has been marked, usefullness of iterative send depends on the statements inside, we can ignore them for now"
-
-	aSendNode isBinaryIterativeSend ifTrue: [
-		| receiver |
-		receiver := aSendNode receiver.
-		(receiver isStatementList and: [ receiver statements size > 1 ])
-			ifTrue: [ self markAsExpressionAndAddToWorkList: receiver ].
-		aSendNode arguments do: [ :subNode | self visit: subNode ].
-		^ true ].
-	aSendNode isDoIterativeSend ifTrue: [
-		self visit: (aSendNode arguments at: 3) ].
-	aSendNode isUnaryIterativeSend ifTrue: [
-		""
-		^ true ].
-
-	aSendNode isUnaryIterativeSendWithImportantLastStatement ifTrue: [
-		self markAsExpressionAndAddToWorkList: aSendNode receiver.
-		^ true ].
-
-	^ false
+	aSendNode isConditionalSend ifFalse: [ ^ false ].
+	self markAsStatementAndAddToWorkList: aSendNode.
+	self markAsExpressionAndAddToWorkList: aSendNode receiver.
+	(markedElementsAsExpression includes: aSendNode) ifTrue: [
+		aSendNode arguments do: [ :arg |
+			self markAsExpressionAndAddToWorkList: arg ] ].
+	^ true
 ]
 
 { #category : 'init-mark-and-worklist' }
@@ -182,8 +160,8 @@ SLDeadCodeElimination >> markAsExpression: aNode [
 { #category : 'mark' }
 SLDeadCodeElimination >> markAsExpressionAndAddToWorkList: aNode [
 
-	(markedElementsAsExpression includes: aNode) ifFalse: [
-		workList add: aNode ].
+	(markedElementsAsExpression includes: aNode) ifTrue: [ ^ self ].
+	workList add: aNode.
 	self markAsExpression: aNode
 ]
 
@@ -196,17 +174,9 @@ SLDeadCodeElimination >> markAsStatement: aNode [
 { #category : 'mark' }
 SLDeadCodeElimination >> markAsStatementAndAddToWorkList: aNode [
 
-	(markedElements includes: aNode) ifFalse: [
-		workList add: aNode ].
+	(markedElements includes: aNode) ifTrue: [ ^ self ].
+	workList add: aNode.
 	self markAsStatement: aNode
-]
-
-{ #category : 'cleaning' }
-SLDeadCodeElimination >> mayCleanVariable: aTVariableNode [
-
-	| varName |
-	varName := aTVariableNode name.
-	variableOccurences at: varName update: [ :counter | counter - 1 ]
 ]
 
 { #category : 'init-mark-and-worklist' }
@@ -340,7 +310,7 @@ SLDeadCodeElimination >> visitReturnNode: aReturnNode [
 { #category : 'mark' }
 SLDeadCodeElimination >> visitSendNode: aSendNode [
 
-	(self handleIterativeSend: aSendNode) ifTrue: [ ^ self ].
+	(self handleConditionalSend: aSendNode) ifTrue: [ ^ self ].
 	self markAsStatementAndAddToWorkList: aSendNode.
 	self markAsExpressionAndAddToWorkList: aSendNode receiver.
 
