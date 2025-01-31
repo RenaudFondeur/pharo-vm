@@ -8,7 +8,8 @@ Class {
 		'markedElementsAsExpression',
 		'currentMethod',
 		'variableOccurences',
-		'variableDefinitions'
+		'variableDefinitions',
+		'variableDefiningStmtList'
 	],
 	#category : 'Slang',
 	#package : 'Slang'
@@ -36,10 +37,8 @@ SLDeadCodeElimination >> addDefinitionsFor: anAssignementNode [
 ]
 
 { #category : 'init-mark-and-worklist' }
-SLDeadCodeElimination >> addOcurrencesFor: aTVariableNode [
+SLDeadCodeElimination >> addOcurrencesFor: varName [
 
-	| varName |
-	varName := aTVariableNode name.
 	variableOccurences
 		at: varName
 		ifPresent: [
@@ -63,8 +62,11 @@ SLDeadCodeElimination >> cleanUnusedVariableDeclaration [
 
 	variableOccurences keysDo: [ :varName |
 		(variableOccurences at: varName) <= 0 ifTrue: [
-			(currentMethod locals includes: varName) ifTrue: [
-				currentMethod removeLocal: varName ] ] ]
+			| definingStmt |
+			definingStmt := variableDefiningStmtList
+				                at: varName
+				                ifAbsent: [ nil ].
+			definingStmt ifNotNil: [ :stmt | stmt removeLocal: varName ] ] ]
 ]
 
 { #category : 'accessing' }
@@ -115,7 +117,8 @@ SLDeadCodeElimination >> handleConditionalSend: aSendNode [
 SLDeadCodeElimination >> initMarkAndWorkList [
 
 	currentMethod locals do: [ :varName |
-		variableOccurences at: varName put: 0 ].
+		variableOccurences at: varName put: 0.
+		variableDefiningStmtList at: varName put: currentMethod parseTree ].
 
 	currentMethod parseTree nodesDo: [ :node |
 		node isSend ifTrue: [ self mayMarkSendNode: node ].
@@ -132,7 +135,10 @@ SLDeadCodeElimination >> initMarkAndWorkList [
 
 		node isLabel ifTrue: [ self markAsStatementAndAddToWorkList: node ].
 
-		node isVariable ifTrue: [ self addOcurrencesFor: node ] ]
+		node isVariable ifTrue: [ self addOcurrencesFor: node name ].
+
+		node isStatementList ifTrue: [
+			self suppressRedundantDeclarationHandleStmtListLocalsIn: node ] ]
 ]
 
 { #category : 'initialization' }
@@ -142,7 +148,8 @@ SLDeadCodeElimination >> initialize [
 	markedElementsAsExpression := IdentitySet new: 300.
 	workList := OrderedCollection new.
 	variableOccurences := Dictionary new: 100.
-	variableDefinitions := Dictionary new: 100
+	variableDefinitions := Dictionary new: 100.
+	variableDefiningStmtList := Dictionary new: 100
 ]
 
 { #category : 'testing' }
@@ -245,6 +252,23 @@ SLDeadCodeElimination >> removeDeadCodeUsing: aCodeGen [
 				currentMethod := m.
 				codeGenerator currentMethod: m.
 				self removeDeadCodeInCurrentMethod ] ]
+]
+
+{ #category : 'init-mark-and-worklist' }
+SLDeadCodeElimination >> suppressRedundantDeclarationHandleStmtListLocalsIn: aStmtListNode [
+	"eliminate redundancy in variable declarations"
+
+	| currentMethodLocals |
+	"don't remove declaration from the initial statementList of the parseTree, the locals are based on it"
+	aStmtListNode parent = currentMethod ifTrue: [ ^ self ].
+
+	currentMethodLocals := currentMethod locals.
+	aStmtListNode locals do: [ :stmtLocal |
+		(currentMethodLocals includes: stmtLocal)
+			ifTrue: [ aStmtListNode removeLocal: stmtLocal ]
+			ifFalse: [
+				self addOcurrencesFor: stmtLocal.
+				variableDefiningStmtList at: stmtLocal put: aStmtListNode ] ]
 ]
 
 { #category : 'mark' }

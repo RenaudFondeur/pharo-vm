@@ -621,6 +621,12 @@ TStatementListNode >> removeLast [
 ]
 
 { #category : 'dead-code-elimination' }
+TStatementListNode >> removeLocal: local [
+
+	self locals: (locals select: [ :l | l ~~ local ])
+]
+
+{ #category : 'dead-code-elimination' }
 TStatementListNode >> removeUnusedNodesInBranch: aChild [
 	"this method should be only called when cleaning an AST tree after an unused expression was found, remove aChild from the list of statements"
 
