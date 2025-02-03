@@ -20,56 +20,36 @@ RBMessageNode >> asTranslatorNodeIn: aTMethod [
 		 rcvrOrNil isVariable and: [ rcvrOrNil name = 'super' ] ]) ifTrue: [
 		^ aTMethod superExpansionNodeFor: usedSelector args: arguments ].
 	usedSelector == #halt ifTrue: [ ^ rcvrOrNil ].
-	(usedSelector == #cCode:inSmalltalk: or: [ usedSelector == #cCode: ])
-		ifTrue: [
-			arguments first isBlockNode ifTrue: [
-				| block |
-				^ (block := arguments first asTranslatorNodeIn: aTMethod)
-					  statements size = 1
-					  ifTrue: [ block statements first ]
-					  ifFalse: [ block ] ].
-			(arguments first isLiteralNode and: [
-				 arguments first value isString and: [
-					 arguments first value isEmpty ] ]) ifTrue: [
-				^ arguments first asTranslatorNodeIn: aTMethod ] ]. "extracting here rather than in translation allows inlining in the block."
+	(#( #cCode:inSmalltalk: #cCode: ) includes: usedSelector) ifTrue: [
+		arguments first isBlockNode ifTrue: [
+			| block |
+			^ (block := arguments first asTranslatorNodeIn: aTMethod)
+				  statements size = 1
+				  ifTrue: [ block statements first ]
+				  ifFalse: [ block ] ].
+		(arguments first isLiteralNode and: [
+			 arguments first value isString and: [
+				 arguments first value isEmpty ] ]) ifTrue: [
+			^ arguments first asTranslatorNodeIn: aTMethod ] ]. "extracting here rather than in translation allows inlining in the block."
 	args := arguments collect: [ :arg | arg asTranslatorNodeIn: aTMethod ].
 
-	usedSelector == #to:do: ifTrue: [
-		| block |
-		usedSelector := #to:by:do:.
-		block := args second.
-		arguments first isLiteralNode
+	(#( #to:do: #to:by:do: ) includes: usedSelector) ifTrue: [
+		| block step |
+		usedSelector = #to:by:do:
 			ifTrue: [
-				args := OrderedCollection
-					        with: args first
-					        with: (TConstantNode value: 1)
-					        with: args second
-					        with: (TAssignmentNode new
-							         setVariable:
-								         (arguments first asTranslatorNodeIn: aTMethod)
-							         expression: (TConstantNode value: 1);
-							         yourself)
-					        with: (TSendNode new
-							         setSelector: #'<='
-							         receiver:
-							         (TVariableNode new setName: block arguments first)
-							         arguments: { (receiver asTranslatorNodeIn: aTMethod) })
-					        with: (TAssignmentNode new
-							         setVariable:
-								         (TVariableNode new setName: block arguments first)
-							         expression: (TSendNode new
-									          setSelector: #+
-									          receiver:
-										          (TVariableNode new setName: block arguments first)
-									          arguments: { (TConstantNode value: 1) });
-							         yourself) ]
+				block := args third.
+				step := args second ]
 			ifFalse: [
-				args := OrderedCollection
-					        with: args first
-					        with: (TConstantNode value: 1)
-					        with: args second
-					        with: (TVariableNode new setName: block arguments first)
-					        with: (TVariableNode new setName: 'iLimit') ] ].
+				block := args second.
+				step := TConstantNode value: 1 ].
+		usedSelector := #to:by:do:.
+		args := OrderedCollection
+			        with: args first
+			        with: step
+			        with: block
+			        with: (TVariableNode new setName: block arguments first).
+		arguments first isLiteralNode ifFalse: [
+			args add: (TVariableNode new setName: 'iLimit') ] ].
 
 	"If in the form of ifNil: [ :obj | ], replace that by an assignment and an ifFalse"
 	(usedSelector == #ifNotNil: and: [ args first arguments notEmpty ])
@@ -147,7 +127,7 @@ RBMessageNode >> asTranslatorNodeIn: aTMethod [
 		usedSelector := #ifTrue:.
 		args := { args first } ].
 
-	((usedSelector == #ifFalse: or: [ usedSelector == #or: ]) and: [
+	((#( #ifFalse: #or: ) includes: usedSelector) and: [
 		 arguments size = 2 and: [ (arguments at: 2) notNil ] ]) ifTrue: [ "Restore argument block that got moved by transformOr: or transformIfFalse:"
 		args := { ((arguments at: 2) asTranslatorNodeIn: aTMethod) } ].
 	(args size > usedSelector numArgs and: [ usedSelector ~~ #to:by:do: ])

@@ -16,11 +16,11 @@ Class {
 }
 
 { #category : 'init-mark-and-worklist' }
-SLDeadCodeElimination >> addDefinitionsFor: anAssignementNode [
+SLDeadCodeElimination >> addDefinitionsFor: anAssignmentNode [
 
 	| varName |
-	varName := anAssignementNode variable name.
-	(anAssignementNode variable isSameAs: anAssignementNode expression)
+	varName := anAssignmentNode variable name.
+	anAssignmentNode isSelfAssign
 		ifTrue: [ ^ self ].
 	variableDefinitions
 		at: varName
@@ -28,11 +28,11 @@ SLDeadCodeElimination >> addDefinitionsFor: anAssignementNode [
 			variableDefinitions
 				at: varName
 				put: ((variableDefinitions at: varName)
-						 add: anAssignementNode;
+						 add: anAssignmentNode;
 						 yourself) ]
 		ifAbsent: [
 			variableDefinitions at: varName put: (OrderedCollection new
-					 add: anAssignementNode;
+					 add: anAssignmentNode;
 					 yourself) ]
 ]
 
@@ -279,6 +279,8 @@ SLDeadCodeElimination >> visit: aNode [
 
 { #category : 'mark' }
 SLDeadCodeElimination >> visitAssignmentNode: anAssignmentNode [
+
+	anAssignmentNode isSelfAssign ifTrue: [ ^ self ].
 
 	self markAsStatementAndAddToWorkList: anAssignmentNode.
 	self markAsExpressionAndAddToWorkList: anAssignmentNode variable.

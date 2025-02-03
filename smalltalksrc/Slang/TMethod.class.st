@@ -912,7 +912,6 @@ TMethod >> ensureConditionalAssignmentsAreTransformedIn: aCodeGen [
 
 { #category : 'transformations' }
 TMethod >> ensureToByDoLoopLimitIsSafeAndEfficient: node in: aCodeGen [
-
 	"For both safety and efficiency, make sure that to:[by:]do: loops
 	 with complex limits have a variable to hold the limit expression.
 	 In C the limit expression is evaluated each time round the loop
@@ -921,35 +920,17 @@ TMethod >> ensureToByDoLoopLimitIsSafeAndEfficient: node in: aCodeGen [
 
 	| limitExpr hasSideEffects |
 	limitExpr := node arguments first.
-	hasSideEffects := limitExpr anySatisfy: [ :subNode | 
-		                  subNode isSend and: [ 
+	hasSideEffects := limitExpr anySatisfy: [ :subNode |
+		                  subNode isSend and: [
 			                  (aCodeGen isBuiltinSelector: subNode selector)
 				                  not and: [ (aCodeGen isStructSend: subNode) not ] ] ].
 	node arguments size = 5
-		ifTrue: [ 
+		ifTrue: [
 			hasSideEffects
-				ifTrue: [ 
+				ifTrue: [
 					cachedLocals := nil.
 					self addLocal: node arguments last name ]
 				ifFalse: [ node arguments: node arguments allButLast ] ]
-		ifFalse: [ "If the expression is complex but as yet there is no limit variable, add it"
-			hasSideEffects ifTrue: [ 
-				| var |
-				var := self
-					       unusedNamePrefixedBy: 'toDoLimit'
-					       avoiding: self locals. "N.B. adds it to locals!!"
-				node arguments: node arguments , { (TVariableNode new
-						 setName: var;
-						 yourself) }.
-				declarations
-					at: node arguments third arguments first
-					ifPresent: [ :decl | 
-						self
-							declarationAt: var
-							put:
-								(self
-									 typeFor: node arguments third arguments first
-									 in: aCodeGen) , ' ' , var ] ] ]
 ]
 
 { #category : 'inlining' }

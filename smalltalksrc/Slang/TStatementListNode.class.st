@@ -67,9 +67,24 @@ TStatementListNode >> accept: aVisitor [
 ]
 
 { #category : 'adding' }
-TStatementListNode >> addAllFirst: aCollectionOfStatement [
+TStatementListNode >> addAllFirst: aListOfStatement [
 
-	self statements: aCollectionOfStatement , statements
+	(statements isNotEmpty and: [ statements first isComment ])
+		ifFalse: [ self statements: aListOfStatement , statements ]
+		ifTrue: [
+			| actualFirst actualFirstMet firstComments allWithoutFirstComments |
+			actualFirst := self firstNonCommentStatement.
+			firstComments := OrderedCollection new.
+			allWithoutFirstComments := OrderedCollection new.
+			actualFirstMet := false.
+			statements do: [ :e |
+				actualFirstMet
+					ifFalse: [
+						firstComments add: e.
+						actualFirstMet := e == actualFirst ]
+					ifTrue: [ allWithoutFirstComments add: e ] ].
+			self statements:
+				firstComments , aListOfStatement , allWithoutFirstComments ]
 ]
 
 { #category : 'adding' }
@@ -441,6 +456,22 @@ TStatementListNode >> endsWithReturn [
 TStatementListNode >> first [
 	
 	^ self statements first
+]
+
+{ #category : 'accessing' }
+TStatementListNode >> firstNonCommentStatement [
+	"the first statement can be a comment if the TStatementList has been through inlining, return the actual first statement"
+
+	| first indexOfFirst limitIndex |
+	first := statements first.
+	indexOfFirst := 1.
+	limitIndex := statements size.
+	[ first isComment ] whileTrue: [
+		indexOfFirst := indexOfFirst + 1.
+		indexOfFirst = limitIndex ifTrue: [ ^ nil ].
+		first := statements at: indexOfFirst ].
+
+	^ first
 ]
 
 { #category : 'flattening' }

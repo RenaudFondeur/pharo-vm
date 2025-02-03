@@ -47,9 +47,9 @@ TAssignmentNode >> asCASTExpressionIn: aCodeGen [
 TAssignmentNode >> asCASTIn: aBuilder [
 
 	| type |
-	expression isSwitch ifTrue: [ 
+	expression isSwitch ifTrue: [
 		^ expression asCASTIn: aBuilder addToEndOfCases: self ].
-	expression isLiteralArrayDeclaration ifTrue: [ 
+	expression isLiteralArrayDeclaration ifTrue: [
 		| literalArrayNode |
 		type := expression arguments last value.
 		self assert: type last = $*.
@@ -57,11 +57,11 @@ TAssignmentNode >> asCASTIn: aBuilder [
 		"Transform the literal array declaration to a C block containing:
 		  - a static literal array declaration
 	 	  - an assigment from this literal array to the assigned variable "
-		literalArrayNode := expression arguments first value collect: [ :e | 
+		literalArrayNode := expression arguments first value collect: [ :e |
 			                    CConstantNode value: e ].
 		^ CCompoundStatementNode
 			  declarations: { (CDeclarationNode
-					   specifiers: { 
+					   specifiers: {
 							   'static'.
 							   type allButLast }
 					   declarator: (CInitDeclaratorNode
@@ -73,18 +73,11 @@ TAssignmentNode >> asCASTIn: aBuilder [
 					   lvalue: (CIdentifierNode name: variable name)
 					   rvalue: (CIdentifierNode name: 'aLiteralArray')) } ].
 
-	(expression isStatementList and: [ expression statements size > 1 ]) 
-		ifTrue: [ 
-			^ expression copy
-				  assignLastExpressionTo: variable;
-				  asCASTIn: aBuilder ].
-	self isVariableUpdatingAssignment ifTrue: [ 
+	self isVariableUpdatingAssignment ifTrue: [
 		^ CAssignmentNode
 			  lvalue: (variable asCASTIn: aBuilder)
 			  operator: expression selector , '='
 			  rvalue: (expression arguments first asCASTExpressionIn: aBuilder) ].
-	(expression isSend and: [ expression isValueExpansion ]) ifTrue: [ 
-		^ self asCASTValueExpansionIn: aBuilder ].
 
 	^ CAssignmentNode
 		  lvalue: (variable asCASTIn: aBuilder)
@@ -277,6 +270,12 @@ TAssignmentNode >> isSameAs: aTParseNode [
 	^aTParseNode isAssignment
 	 and: [(variable isSameAs: aTParseNode variable)
 	 and: [expression isSameAs: aTParseNode expression]]
+]
+
+{ #category : 'dead-code-elimination' }
+TAssignmentNode >> isSelfAssign [
+
+	^ variable isSameAs: expression
 ]
 
 { #category : 'testing' }

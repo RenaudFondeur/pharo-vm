@@ -585,7 +585,7 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithUselessCodeInBinaryIterativeNoSen
 	| translation tMethod |
 	tMethod := ccg methodNamed: #methodWithUselessCodeInBinaryIterativeNoSendInLimit.
 	tMethod prepareMethodIn: ccg.
-
+	
 	sLDeadCodeElimination currentMethod: tMethod.
 	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
@@ -615,6 +615,7 @@ methodWithUselessCodeInBinaryIterativeNoSendInLimit(void)
 
 { #category : 'useless-code-binary-iterative' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit [
+
 	| translation tMethod |
 	tMethod := ccg methodNamed:
 		           #methodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit.
