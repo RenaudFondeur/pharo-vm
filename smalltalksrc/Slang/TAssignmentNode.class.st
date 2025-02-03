@@ -230,8 +230,8 @@ TAssignmentNode >> displayString [
 TAssignmentNode >> expandASTIn: atMethod [
 
 	| replacement |
-	(expression isStatementList and: [ expression statements size > 1 ])
-		ifTrue: [ replacement := self asStatementListExpansionAsExpression ].
+	expression isStatementList ifTrue: [
+		replacement := self asStatementListExpansionAsExpression ].
 
 	(expression isSend and: [ expression isValueExpansion ]) ifTrue: [
 		expression expandASTIn: atMethod.

@@ -283,9 +283,11 @@ TSendNode >> children [
 TSendNode >> collectSendInSelf: sendToCollect [
 	"collect send message in the receiver of a conditional send, in we encounter a comparaison operator, we split it and iterate through its left and right values to avoid having unused expression result"
 
-	self isSelectorWithNoSideEffect ifFalse: [ sendToCollect add: self ].
-	receiver collectSendInSelf: sendToCollect.
-	arguments do: [ :arg | arg collectSendInSelf: sendToCollect ]
+	self isSelectorWithNoSideEffect
+		ifFalse: [ sendToCollect add: self ]
+		ifTrue: [
+			receiver collectSendInSelf: sendToCollect.
+			arguments do: [ :arg | arg collectSendInSelf: sendToCollect ] ]
 ]
 
 { #category : 'accessing' }
@@ -382,8 +384,8 @@ TSendNode >> hasSideEffect [
 	| sends |
 	sends := OrderedCollection new.
 	self collectSendInSelf: sends.
-	sends isNotEmpty ifTrue: [ ^ false ].
-	^ true
+	sends isNotEmpty ifTrue: [ ^ true ].
+	^ false
 ]
 
 { #category : 'testing' }
@@ -479,8 +481,8 @@ TSendNode >> isSameAs: aTParseNode [
 { #category : 'dead-code-elimination' }
 TSendNode >> isSelectorWithNoSideEffect [
 
-	^ (#( #+ #- #* #/ #'//' #'\\' #= #'==' #'~=' #'~~' #< #'<=' #> #'>=' )
-		   includes: selector) not
+	^ #( #+ #- #* #/ #'//' #'\\' #= #'==' #'~=' #'~~' #< #'<=' #> #'>='
+	     #and: #or: #negated #'<<' #'>>' #'>>>' ) includes: selector
 ]
 
 { #category : 'C code generation' }

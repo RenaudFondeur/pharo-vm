@@ -200,14 +200,13 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithCCoerceInExpression [
 		assert: translation
 		equals:
 			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithCCoerceInExpression */
-static sqInt
+static char *
 methodWithCCoerceInExpression(void)
 {
-	int i;
+	char *i;
 
-	i = 8;
-	((char *) i );
-	return i + 5;
+	i = 5;
+	return i;
 }'
 ]
 
@@ -240,6 +239,10 @@ methodWithEmptyCaseOfSendInReceiver(void)
 			{
 				return;
 			}
+		}
+		break;
+		case 6:
+		{
 		}
 		break;
 		default:
@@ -306,7 +309,9 @@ methodWithNeverUsedLocalsFromBlock(void)
 	int var1;
 
 	var1 = 5;
-	var1 = var1 + 1;
+	{
+		var1 += 1;
+	}
 	return var1;
 }'
 ]
@@ -420,6 +425,7 @@ SLDeadCodeEliminationAlgoTest >> testMethodWithOnlyBlockValueAssignmentIntoSameV
 		           #methodWithOnlyBlockValueAssignmentIntoSameVariableInArguments.
 	sLDeadCodeElimination currentMethod: tMethod.
 	ccg currentMethod: tMethod.
+
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -673,7 +679,6 @@ methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit(void)
 	sqInt iLimit;
 	int var1;
 
-	iLimit = 0;
 	var1 = 0;
 	for (i = 2, iLimit = method(); i <= iLimit; i += 1) {
 		var1 += 1;

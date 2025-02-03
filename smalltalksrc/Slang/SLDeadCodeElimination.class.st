@@ -257,16 +257,15 @@ SLDeadCodeElimination >> removeDeadCodeUsing: aCodeGen [
 SLDeadCodeElimination >> suppressRedundantDeclarationHandleStmtListLocalsIn: aStmtListNode [
 	"eliminate redundancy in variable declarations"
 
-	| currentMethodLocals |
+	| allLocals |
 	"don't remove declaration from the initial statementList of the parseTree, the locals are based on it"
 	aStmtListNode parent = currentMethod ifTrue: [ ^ self ].
-
-	currentMethodLocals := currentMethod locals.
+	allLocals := variableOccurences keys.
 	aStmtListNode locals do: [ :stmtLocal |
-		(currentMethodLocals includes: stmtLocal)
+		(allLocals includes: stmtLocal)
 			ifTrue: [ aStmtListNode removeLocal: stmtLocal ]
 			ifFalse: [
-				self addOcurrencesFor: stmtLocal.
+				variableOccurences at: stmtLocal put: 0.
 				variableDefiningStmtList at: stmtLocal put: aStmtListNode ] ]
 ]
 
