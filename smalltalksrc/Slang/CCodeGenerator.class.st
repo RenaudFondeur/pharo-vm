@@ -1060,13 +1060,19 @@ CCodeGenerator >> emitCCodeOn: aStream doInlining: inlineFlag doAssertions: asse
 	self renameKeywordsConflicts.
 
 	self doInlining: inlineFlag.
-	"SLDeadCodeEliminationVisitor new removeDeadCodeUsing: self."
-	SLDeadCodeElimination new removeDeadCodeUsing: self.
 
 	SLAutomaticLocalization new
 		codeGenerator: self;
 		applyMethodNamed: #interpret.
 
+	"clean out no longer valid variable names and then
+	 handle any global variable usage in each method"
+	methods do: [ :m |
+		self
+			checkForGlobalUsage: (m removeUnusedTempsAndNilIfRequiredIn: self)
+			in: m ].
+	self localizeGlobalVariables.
+	SLDeadCodeElimination new removeDeadCodeUsing: self.
 	"code generation"
 
 	"If we're outputting the VM put the main interpreter loop first for two reasons.
@@ -1079,13 +1085,6 @@ CCodeGenerator >> emitCCodeOn: aStream doInlining: inlineFlag doAssertions: asse
 	(methods includesKey: #interpret) ifTrue: [
 		methodList := { (methods at: #interpret) }
 		              , (methodList copyWithout: (methods at: #interpret)) ].
-	"clean out no longer valid variable names and then
-	 handle any global variable usage in each method"
-	methodList do: [ :m |
-		self
-			checkForGlobalUsage: (m removeUnusedTempsAndNilIfRequiredIn: self)
-			in: m ].
-	self localizeGlobalVariables.
 
 
 

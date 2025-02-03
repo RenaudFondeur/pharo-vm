@@ -67,6 +67,12 @@ TStatementListNode >> accept: aVisitor [
 ]
 
 { #category : 'adding' }
+TStatementListNode >> addAllFirst: aCollectionOfStatement [
+
+	self statements: aCollectionOfStatement , statements
+]
+
+{ #category : 'adding' }
 TStatementListNode >> addAllLast: aListOfStatement [
 
 	(statements isNotEmpty and: [ statements last isComment ])
@@ -129,23 +135,27 @@ TStatementListNode >> addReadBeforeAssignedIn: variables to: readBeforeAssigned 
 							assigned add:
 								(node arguments first detect: [ :subnode | subnode isVariable ])
 									name ].
-					(#( #to:do: #to:by:do: ) includes: node selector) ifTrue: [
+					#to:by:do: = node selector ifTrue: [
 						assigned addAll:
 							(node arguments at: node selector numArgs) arguments.
-						mayHaveSideEffects := node arguments size = 4. "See TMethod>>prepareMethodIn:"
+						mayHaveSideEffects := node arguments size = 5. "See TMethod>>prepareMethodIn:"
 						mayHaveSideEffects ifTrue: [
 							assigned add: node arguments last name ] ].
 					"Then deal with read-before-written in the arms of conditionals..."
 					(#( ifTrue: ifFalse: ifNil: ifNotNil: ) intersection:
 						 node selector keywords) notEmpty
 						ifTrue: [ "First find assignments in the expression..."
+							| receiver |
+							receiver := node receiver.
 							(TStatementListNode new
-								 statements: { node receiver };
+								 statements: { receiver };
 								 yourself)
 								addReadBeforeAssignedIn: variables
 								to: readBeforeAssigned
 								assignments: assigned
 								in: aCodeGen.
+							"restore the right parent"
+							receiver parent: node.
 							"Now find read-before-written in each arm, and collect the assignments to spot those assigned in both arms"
 							conditionalAssignments := node arguments
 								                          collect: [ :block |

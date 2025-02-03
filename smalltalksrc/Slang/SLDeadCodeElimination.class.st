@@ -243,7 +243,7 @@ SLDeadCodeElimination >> removeDeadCodeUsing: aCodeGen [
 
 	codeGenerator := aCodeGen.
 	UIManager default
-		displayProgress: 'dead code elimation '
+		displayProgress: 'dead code elimination '
 		from: 0
 		to: codeGenerator methods size
 		during: [ :bar |
