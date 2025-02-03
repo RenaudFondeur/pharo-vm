@@ -200,11 +200,10 @@ SLDeadCodeElimination >> mayMarkAssignementNode: anAssignmentNode [
 SLDeadCodeElimination >> mayMarkSendNode: aSendNode [
 
 	(aSendNode hasSideEffect not or: [
-		 aSendNode isSelectorWithNoSideEffect or: [
-			 aSendNode isConditionalSend or: [
-				 aSendNode isIterativeSend or: [
-					 (self isStructAccessorWithNoSideEffect: aSendNode) or: [
-						 aSendNode selector beginsWith: #cCoerce ] ] ] ] ]) ifTrue: [
+		 aSendNode isConditionalSend or: [
+			 aSendNode isIterativeSend or: [
+				 (self isStructAccessorWithNoSideEffect: aSendNode) or: [
+					 aSendNode selector beginsWith: #cCoerce ] ] ] ]) ifTrue: [
 		^ self ].
 	self visitSendNode: aSendNode
 ]

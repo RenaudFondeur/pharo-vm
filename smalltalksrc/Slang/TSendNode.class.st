@@ -280,20 +280,12 @@ TSendNode >> children [
 ]
 
 { #category : 'dead-code-elimination' }
-TSendNode >> collectSendInArguments: sendToCollect [
-
-	arguments do: [ :arg | arg collectSendInSelf: sendToCollect ]
-]
-
-{ #category : 'dead-code-elimination' }
 TSendNode >> collectSendInSelf: sendToCollect [
 	"collect send message in the receiver of a conditional send, in we encounter a comparaison operator, we split it and iterate through its left and right values to avoid having unused expression result"
 
-	self isSelectorWithNoSideEffect
-		ifFalse: [ sendToCollect add: self ]
-		ifTrue: [
-			receiver collectSendInSelf: sendToCollect.
-			self collectSendInArguments: sendToCollect ]
+	self isSelectorWithNoSideEffect ifFalse: [ sendToCollect add: self ].
+	receiver collectSendInSelf: sendToCollect.
+	arguments do: [ :arg | arg collectSendInSelf: sendToCollect ]
 ]
 
 { #category : 'accessing' }
@@ -386,7 +378,12 @@ TSendNode >> expandASTIn: aTMethod [
 { #category : 'testing' }
 TSendNode >> hasSideEffect [
 	"Answer if the parse tree rooted at this node has a side-effect or not."
-	^(#(#+ #- #* #/ #// #\\ #= #== #~= #~~) includes: selector) not
+
+	| sends |
+	sends := OrderedCollection new.
+	self collectSendInSelf: sends.
+	sends isNotEmpty ifTrue: [ ^ false ].
+	^ true
 ]
 
 { #category : 'testing' }
@@ -481,7 +478,9 @@ TSendNode >> isSameAs: aTParseNode [
 
 { #category : 'dead-code-elimination' }
 TSendNode >> isSelectorWithNoSideEffect [
-	^ #(#= #== #< #<= #> #>=) includes: selector
+
+	^ (#( #+ #- #* #/ #'//' #'\\' #= #'==' #'~=' #'~~' #< #'<=' #> #'>=' )
+		   includes: selector) not
 ]
 
 { #category : 'C code generation' }
