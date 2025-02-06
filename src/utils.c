@@ -495,8 +495,14 @@ static int stackPageHeadroom;
 int
 osCogStackPageHeadroom()
 {
-	if (!stackPageHeadroom)
+	if (!stackPageHeadroom){
+		#if defined(SIGSTKSZ) /* posix */
 		stackPageHeadroom = SIGSTKSZ + 1024;
+		#else // Non-posix, possibly mingw using exception, use 4k as stack size
+		stackPageHeadroom = 4096 + 1024;
+		#endif
+	}
+		
 	return stackPageHeadroom;
 }
 
