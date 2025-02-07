@@ -399,6 +399,10 @@ SLDeadCodeElimination >> visitSendNode: aSendNode [
 	self markAsStatementAndAddToWorkList: aSendNode.
 	self markAsExpressionAndAddToWorkList: aSendNode receiver.
 
+	aSendNode selector = #cCall:withArguments: ifTrue: [
+		(aSendNode arguments at: 2) statements do: [ :stmt |
+			self markAsExpressionAndAddToWorkList: stmt ] ].
+
 	aSendNode arguments do: [ :arg |
 		self markAsExpressionAndAddToWorkList: arg ]
 ]
