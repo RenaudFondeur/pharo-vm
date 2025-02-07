@@ -253,6 +253,23 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithUselessCodeInBinaryIterativeSend
 ]
 
 { #category : 'useless-local-in-sub-branches' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithUselessLocalsDefinitionsWithSameNameInSubBranches [
+
+	| var1 var2 |
+	var1 := 0.
+	var2 := 1.
+	var1 = 1 ifFalse: [
+		| subVar1 subVar2 |
+		subVar1 := 5.
+		var1 := self method: subVar1 ].
+	var1 = 1 ifFalse: [
+		| subVar2 |
+		subVar2 := 5 + 5.
+		var1 := self method: subVar2 ].
+	^ var1
+]
+
+{ #category : 'useless-local-in-sub-branches' }
 SLDeadCodeEliminationAlgoTestClass >> methodWithUselessLocalsInSubBranches [
 
 	| var1 var2 |
@@ -263,6 +280,24 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithUselessLocalsInSubBranches [
 		subVar2 := 5 + 5.
 		subVar1 := 5.
 		var1 := self method: subVar1 ].
+	^ var1
+]
+
+{ #category : 'useless-local-in-sub-branches' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithUselessLocalsWithSameNameInSubBranches [
+
+	| var1 var2 |
+	var1 := 0.
+	var2 := 1.
+	var1 = 1 ifFalse: [
+		| subVar1 subVar2 |
+		subVar2 := 5 + 5.
+		subVar1 := 5.
+		var1 := self method: subVar1 ].
+	var1 = 1 ifFalse: [
+		| subVar2 |
+		subVar2 := 5 + 5.
+		var1 := self method: subVar2 ].
 	^ var1
 ]
 

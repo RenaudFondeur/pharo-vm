@@ -66,6 +66,16 @@ SLDeadCodeElimination >> addLocalDefinitionFor: aStmtListNode [
 { #category : 'init-variable-data' }
 SLDeadCodeElimination >> addOcurrencesFor: varName in: definingStmt [
 
+	self addOcurrencesFor: varName in: definingStmt init: false
+]
+
+{ #category : 'init-variable-data' }
+SLDeadCodeElimination >> addOcurrencesFor: varName in: definingStmt init: aBoolean [
+
+	| init |
+	init := aBoolean
+		        ifTrue: [ 0 ]
+		        ifFalse: [ 1 ].
 	variableOccurences
 		at: varName
 		ifPresent: [
@@ -75,10 +85,10 @@ SLDeadCodeElimination >> addOcurrencesFor: varName in: definingStmt [
 				at: definingStmt
 				ifPresent: [
 				subDict at: definingStmt update: [ :counter | counter + 1 ] ]
-				ifAbsent: [ subDict at: definingStmt put: 1 ] ]
+				ifAbsent: [ subDict at: definingStmt put: init ] ]
 		ifAbsent: [
 			variableOccurences at: varName put: (Dictionary new
-					 at: definingStmt put: 1;
+					 at: definingStmt put: init;
 					 yourself) ]
 ]
 
@@ -93,9 +103,7 @@ SLDeadCodeElimination >> addStmtListLocalsAndSuppressRedundantDeclarationIn: aSt
 		(allLocals includes: stmtLocal)
 			ifTrue: [ aStmtListNode removeLocal: stmtLocal ]
 			ifFalse: [
-				variableOccurences
-					at: stmtLocal
-					put: (Dictionary new at: aStmtListNode put: 0 ; yourself) ] ]
+			self addOcurrencesFor: stmtLocal in: aStmtListNode init: true ] ]
 ]
 
 { #category : 'cleaning' }

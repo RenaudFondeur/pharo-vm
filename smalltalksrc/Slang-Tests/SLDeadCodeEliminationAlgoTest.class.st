@@ -688,6 +688,46 @@ methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit(void)
 ]
 
 { #category : 'useless-local-in-sub-branches' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithUselessLocalsDefinitionsWithSameNameInSubBranches [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUselessLocalsDefinitionsWithSameNameInSubBranches.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithUselessLocalsDefinitionsWithSameNameInSubBranches */
+static sqInt
+methodWithUselessLocalsDefinitionsWithSameNameInSubBranches(void)
+{
+	int subVar1;
+	int subVar2;
+	sqInt var1;
+
+	var1 = 0;
+	if (!(var1 == 1)) {
+		subVar1 = 5;
+		var1 = method(subVar1);
+	}
+	if (!(var1 == 1)) {
+		subVar2 = 5 + 5;
+		var1 = method(subVar2);
+	}
+	return var1;
+}'
+]
+
+{ #category : 'useless-local-in-sub-branches' }
 SLDeadCodeEliminationAlgoTest >> testMethodWithUselessLocalsInSubBranches [
 
 	| translation tMethod |
@@ -711,12 +751,53 @@ static sqInt
 methodWithUselessLocalsInSubBranches(void)
 {
 	int subVar1;
-	int var1;
+	sqInt var1;
 
 	var1 = 0;
 	if (!(var1 == 1)) {
 		subVar1 = 5;
 		var1 = method(subVar1);
+	}
+	return var1;
+}'
+]
+
+{ #category : 'useless-local-in-sub-branches' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithUselessLocalsWithSameNameInSubBranches [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUselessLocalsWithSameNameInSubBranches.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithUselessLocalsWithSameNameInSubBranches */
+static sqInt
+methodWithUselessLocalsWithSameNameInSubBranches(void)
+{
+	int subVar1;
+	int subVar2;
+	sqInt var1;
+
+	var1 = 0;
+	if (!(var1 == 1)) {
+		subVar2 = 5 + 5;
+		subVar1 = 5;
+		var1 = method(subVar1);
+	}
+	if (!(var1 == 1)) {
+		subVar2 = 5 + 5;
+		var1 = method(subVar2);
 	}
 	return var1;
 }'
