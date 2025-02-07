@@ -49,17 +49,17 @@ SLDeadCodeEliminationAlgoTest >> testInlineInSwitchRemovesReturnStatement [
 		assert: translation
 		equals: '/* Spur64BitMemoryManager>>#numSlotsForShortening:toIndexableSize: */
 static sqInt
-numSlotsForShorteningtoIndexableSize(sqInt objOop, sqInt indexableSize)
+numSlotsForShorteningtoIndexableSize(sqInt _objOop, sqInt _indexableSize)
 {
-	switch (formatOf(objOop)) {
+	switch (formatOf(_objOop)) {
 		case 2:
 		{
-			return indexableSize;
+			return _indexableSize;
 		}
 		case firstLongFormat():
 		case (firstLongFormat()) + 1:
 		{
-			return numSlotsForBytes(indexableSize * 4);
+			return numSlotsForBytes(_indexableSize * 4);
 		}
 		default:
 		error("Case not found and no otherwise clause");
@@ -614,7 +614,7 @@ methodWithUselessCodeInBinaryIterativeNoSendInLimit(void)
 	var1 = 0;
 	for (i = 2; i <= 5; i += 1) {
 		var1 += 1;
-	};
+	}
 	return var1;
 }'
 ]
@@ -648,7 +648,7 @@ methodWithUselessCodeInBinaryIterativeSendWithNoSideEffectsInLimit(void)
 	var1 = 0;
 	for (i = 2; i <= (5 + 5); i += 1) {
 		var1 += 1;
-	};
+	}
 	return var1;
 }'
 ]
@@ -682,7 +682,7 @@ methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit(void)
 	var1 = 0;
 	for (i = 2, iLimit = method(); i <= iLimit; i += 1) {
 		var1 += 1;
-	};
+	}
 	return var1;
 }'
 ]

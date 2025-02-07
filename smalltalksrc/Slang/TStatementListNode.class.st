@@ -91,7 +91,10 @@ TStatementListNode >> addAllFirst: aListOfStatement [
 TStatementListNode >> addAllLast: aListOfStatement [
 
 	(statements isNotEmpty and: [ statements last isComment ])
-		ifFalse: [ self statements: (statements addAllLast: aListOfStatement) ]
+		ifFalse: [
+			self statements: (statements
+					 addAllLast: aListOfStatement;
+					 yourself) ]
 		ifTrue: [
 			| actualLast actualLastMet allWithoutEndComment endComment |
 			actualLast := self lastNonCommentStatement.

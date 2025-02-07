@@ -72,12 +72,19 @@ TAssignmentNode >> asCASTIn: aBuilder [
 			  statements: { (CAssignmentNode
 					   lvalue: (CIdentifierNode name: variable name)
 					   rvalue: (CIdentifierNode name: 'aLiteralArray')) } ].
-
+	(expression isStatementList and: [ expression statements size > 1 ])
+		ifTrue: [
+			^ expression copy
+				  assignLastExpressionTo: variable;
+				  asCASTIn: aBuilder ].
 	self isVariableUpdatingAssignment ifTrue: [
 		^ CAssignmentNode
 			  lvalue: (variable asCASTIn: aBuilder)
 			  operator: expression selector , '='
 			  rvalue: (expression arguments first asCASTExpressionIn: aBuilder) ].
+		
+	(expression isSend and: [ expression isValueExpansion ]) ifTrue: [
+		^ self asCASTValueExpansionIn: aBuilder ].
 
 	^ CAssignmentNode
 		  lvalue: (variable asCASTIn: aBuilder)
@@ -86,7 +93,7 @@ TAssignmentNode >> asCASTIn: aBuilder [
 
 { #category : 'C code generation' }
 TAssignmentNode >> asCASTStatementListExpansionAsExpression: aCodeGen [
-	self halt.
+"	self halt."
 	(variable isSameAs: expression lastNonCommentStatement) ifTrue: [
 		^ expression asCASTExpressionIn: aCodeGen ].
 	^ expression copy
@@ -98,7 +105,7 @@ TAssignmentNode >> asCASTStatementListExpansionAsExpression: aCodeGen [
 TAssignmentNode >> asCASTValueExpansionIn: aCodeGen [
 
 	| stmtList lastStmt copy |
-	self halt.
+"	self halt."
 	"Transform assignments of the form:
 	
 	var := [ a . block . lastexpression ] value.

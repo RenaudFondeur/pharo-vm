@@ -424,6 +424,12 @@ TSendNode >> isDoIterativeSend [
 	^ #( #to:do: #to:by:do: ) includes: selector
 ]
 
+{ #category : 'testing' }
+TSendNode >> isExpression [
+
+	^ true
+]
+
 { #category : 'dead-code-elimination' }
 TSendNode >> isIterativeSend [
 
@@ -431,12 +437,6 @@ TSendNode >> isIterativeSend [
 		  self isDoIterativeSend or: [
 			  self isUnaryIterativeSend or:
 				  self isUnaryIterativeSendWithImportantLastStatement ] ]
-]
-
-{ #category : 'testing' }
-TSendNode >> isExpression [
-
-	^ true
 ]
 
 { #category : 'testing' }

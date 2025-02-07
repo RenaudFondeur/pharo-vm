@@ -266,23 +266,31 @@ SlangTyper >> mergeTypeOf: var in: aDictionary with: newType method: tMethod [
 	 Either assign its type, if it is as yet untyped, or merge newType with its existing type.
 	 N.B. We refuse to promote a variable that already has integral type to a floating point
 	 type.  The existing plugins depend on this; one can always use an explicit type in future."
+
 	| existingType mergedType |
 	existingType := codeGenerator
-						extractTypeFor: var
-						fromDeclaration: (aDictionary at: var ifAbsentPut: [newType, ' ', var]).
-	existingType ~= newType ifTrue:
-		[((codeGenerator isPointerCType: existingType)
-		  or: [codeGenerator isPointerCType: newType])
-			ifTrue:
-				[existingType = #'void *' ifTrue: [^newType].
-				 newType = #'void *' ifTrue: [^existingType].
-				 codeGenerator logger show: 'conflicting types ', existingType, ' ', newType, ' for ', var, ' in ', tMethod selector.
-				 ^existingType]
-			ifFalse:
-				[((codeGenerator isIntegralCType: existingType)
-				  and: [codeGenerator isFloatingPointCType: newType]) ifFalse:
-					[mergedType := codeGenerator promoteArithmeticTypes: existingType and: newType.
-					 aDictionary at: var put: mergedType, ' ', var]]]
+		                extractTypeFor: var
+		                fromDeclaration:
+		                (aDictionary
+			                 at: var
+			                 ifAbsentPut: [ newType , ' ' , var ]).
+	existingType ~= newType ifTrue: [
+		((codeGenerator isPointerCType: existingType) or: [
+			 codeGenerator isPointerCType: newType ])
+			ifTrue: [
+				existingType = #'void *' ifTrue: [ ^ newType ].
+				newType = #'void *' ifTrue: [ ^ existingType ].
+				codeGenerator logger show:
+					'conflicting types ' , existingType , ' ' , newType , ' for '
+					, var , ' in ' , tMethod selector.
+				^ existingType ]
+			ifFalse: [
+				((codeGenerator isIntegralCType: existingType) and: [
+					 codeGenerator isFloatingPointCType: newType ]) ifFalse: [
+					mergedType := codeGenerator
+						              promoteArithmeticTypes: existingType
+						              and: newType.
+					aDictionary at: var put: mergedType , ' ' , var ] ] ]
 ]
 
 { #category : 'type inference' }

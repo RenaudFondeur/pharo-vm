@@ -1600,7 +1600,7 @@ SlangBasicTranslationTest >> testInlineWithUnecessaryCoerce [
 static sqInt
 methodCallingMethodWithCCoerceInReturn(void)
 {
-	method();
+	((sqInt) (method()) );
 	return 0;
 }'
 ]
@@ -5776,11 +5776,12 @@ SlangBasicTranslationTest >> testSendToByDo [
 
 { #category : 'tests-builtins' }
 SlangBasicTranslationTest >> testSendToByDoLimitExpressionHasSideEffect [
-
 	"1 to: (var foo) by: 2 do: [ var := var -7 ]"
+
 	"In the C for loop, the limit expression is executed at each iteration.
 	In Pharo, the limit expression (var foo in this exemple) is executed only once, the value is then passed as argument to the function to:by:do:.
 	If the limit expression has side-effect, a limit variable is declared, for both safety and efficiency."
+
 	| translation send variable expression |
 	variable := TVariableNode new setName: 'var'.
 
@@ -5791,7 +5792,7 @@ SlangBasicTranslationTest >> testSendToByDoLimitExpressionHasSideEffect [
 	send := TSendNode new
 		        setSelector: #to:by:do:
 		        receiver: (TConstantNode value: 1)
-		        arguments: { 
+		        arguments: {
 				        (TSendNode new
 					         setSelector: #foo
 					         receiver: (TVariableNode new setName: 'var')
@@ -5803,12 +5804,14 @@ SlangBasicTranslationTest >> testSendToByDoLimitExpressionHasSideEffect [
 					         { (TAssignmentNode new
 						          setVariable: variable
 						          expression: expression) }).
-						(TVariableNode new setName: 'toDoLimit') }.
+				        (TVariableNode new setName: 'i').
+				        (TVariableNode new setName: 'toDoLimit') }.
 	translation := self translate: send.
 
 	self
 		assert: translation trimBoth
-		equals: 'for (i = 1, toDoLimit = foo(var); i <= toDoLimit; i += 2) {
+		equals:
+			'for (i = 1, toDoLimit = foo(var); i <= toDoLimit; i += 2) {
 	var -= 7;
 }'
 ]
