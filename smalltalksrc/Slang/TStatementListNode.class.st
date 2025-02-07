@@ -664,7 +664,7 @@ TStatementListNode >> removeLast [
 { #category : 'dead-code-elimination' }
 TStatementListNode >> removeLocal: local [
 
-	self locals: (locals select: [ :l | l ~~ local ])
+	self locals: (locals select: [ :l | l ~= local ])
 ]
 
 { #category : 'dead-code-elimination' }
