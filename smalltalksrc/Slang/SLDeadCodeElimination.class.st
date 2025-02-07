@@ -167,8 +167,12 @@ SLDeadCodeElimination >> findAndHandleStatementsVariablesIn: aNode [
 		self addLocalDefinitionFor: aNode.
 		^ self ].
 	aNode isLeaf ifFalse: [
-		aNode children do: [ :subNode |
-			self findAndHandleStatementsVariablesIn: subNode ] ]
+		aNode isInline
+			ifTrue: [
+			self findAndHandleStatementsVariablesIn: aNode method parseTree ]
+			ifFalse: [
+				aNode children do: [ :subNode |
+					self findAndHandleStatementsVariablesIn: subNode ] ] ]
 ]
 
 { #category : 'mark' }
