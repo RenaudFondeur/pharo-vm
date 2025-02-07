@@ -487,7 +487,7 @@ TStatementListNode >> initialize [
 	super initialize.
 	declarations := Dictionary new.
 	usedVariables := Set new.
-	locals := OrderedCollection new.
+	locals := Set new.
 	arguments := #()
 ]
 
