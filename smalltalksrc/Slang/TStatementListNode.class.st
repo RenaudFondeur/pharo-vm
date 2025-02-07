@@ -568,7 +568,7 @@ TStatementListNode >> locals [
 { #category : 'accessing' }
 TStatementListNode >> locals: anObject [
 
-	locals := anObject
+	locals := anObject asSet
 ]
 
 { #category : 'enumerating' }
