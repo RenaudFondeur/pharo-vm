@@ -252,6 +252,20 @@ SLDeadCodeEliminationAlgoTestClass >> methodWithUselessCodeInBinaryIterativeSend
 	^ var1
 ]
 
+{ #category : 'useless-local-in-sub-branches' }
+SLDeadCodeEliminationAlgoTestClass >> methodWithUselessLocalsInSubBranches [
+
+	| var1 var2 |
+	var1 := 0.
+	var2 := 1.
+	var1 = 1 ifFalse: [
+		| subVar1 subVar2 |
+		subVar2 := 5 + 5.
+		subVar1 := 5.
+		var1 := self method: subVar1 ].
+	^ var1
+]
+
 { #category : 'debug' }
 SLDeadCodeEliminationAlgoTestClass >> pop: nItems thenPushBool: boolean [
 

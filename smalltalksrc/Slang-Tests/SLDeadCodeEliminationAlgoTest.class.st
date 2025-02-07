@@ -687,6 +687,41 @@ methodWithUselessCodeInBinaryIterativeSendWithSideEffectsInLimit(void)
 }'
 ]
 
+{ #category : 'useless-local-in-sub-branches' }
+SLDeadCodeEliminationAlgoTest >> testMethodWithUselessLocalsInSubBranches [
+
+	| translation tMethod |
+	tMethod := ccg methodNamed: #methodWithUselessLocalsInSubBranches.
+	tMethod prepareMethodIn: ccg.
+
+	sLDeadCodeElimination currentMethod: tMethod.
+	ccg currentMethod: tMethod.
+
+	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
+
+	translation := self translate: tMethod.
+	translation := translation trimBoth.
+
+	self
+		assert: translation
+		equals:
+			'/* SLDeadCodeEliminationAlgoTestClass>>#methodWithUselessLocalsInSubBranches */
+static sqInt
+methodWithUselessLocalsInSubBranches(void)
+{
+	int subVar1;
+	int var1;
+
+	var1 = 0;
+	if (!(var1 == 1)) {
+		subVar1 = 5;
+		var1 = method(subVar1);
+	}
+	return var1;
+}'
+]
+
 { #category : 'useless-assignment' }
 SLDeadCodeEliminationAlgoTest >> testPopThenPushBool [
 

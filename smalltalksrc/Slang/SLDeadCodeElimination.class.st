@@ -16,7 +16,7 @@ Class {
 	#package : 'Slang'
 }
 
-{ #category : 'init-mark-and-worklist' }
+{ #category : 'init-variable-data' }
 SLDeadCodeElimination >> addDefiningStatementFor: aTVariableNode [
 
 	| definingStmt varName |
@@ -28,7 +28,7 @@ SLDeadCodeElimination >> addDefiningStatementFor: aTVariableNode [
 	self addOcurrencesFor: varName in: definingStmt
 ]
 
-{ #category : 'init-mark-and-worklist' }
+{ #category : 'init-variable-data' }
 SLDeadCodeElimination >> addDefinitionsFor: anAssignmentNode [
 
 	| varName |
@@ -49,7 +49,7 @@ SLDeadCodeElimination >> addDefinitionsFor: anAssignmentNode [
 					 yourself) ]
 ]
 
-{ #category : 'init-mark-and-worklist' }
+{ #category : 'init-variable-data' }
 SLDeadCodeElimination >> addLocalDefinitionFor: aStmtListNode [
 
 	self addStmtListLocalsAndSuppressRedundantDeclarationIn:
@@ -63,7 +63,7 @@ SLDeadCodeElimination >> addLocalDefinitionFor: aStmtListNode [
 	localVariableScope pop
 ]
 
-{ #category : 'init-mark-and-worklist' }
+{ #category : 'init-variable-data' }
 SLDeadCodeElimination >> addOcurrencesFor: varName in: definingStmt [
 
 	variableOccurences
@@ -82,7 +82,7 @@ SLDeadCodeElimination >> addOcurrencesFor: varName in: definingStmt [
 					 yourself) ]
 ]
 
-{ #category : 'init-mark-and-worklist' }
+{ #category : 'init-variable-data' }
 SLDeadCodeElimination >> addStmtListLocalsAndSuppressRedundantDeclarationIn: aStmtListNode [
 	"eliminate redundancy in variable declarations and mark locals that was not seen at the method scope"
 
@@ -148,16 +148,14 @@ SLDeadCodeElimination >> currentMethod: aTMethod [
 SLDeadCodeElimination >> decreaseVariableOcurencesFor: aTVariableNode [
 
 	| definingStmtList |
-	definingStmtList := variableDefiningStmtList
-		                    at: aTVariableNode
-		                    ifAbsent: [ nil ].
+	definingStmtList := variableDefiningStmtList at: aTVariableNode.
 	definingStmtList ifNil: [ ^ self ].
 	(variableOccurences at: aTVariableNode name)
 		at: definingStmtList
 		update: [ :counter | counter - 1 ]
 ]
 
-{ #category : 'init-mark-and-worklist' }
+{ #category : 'init-variable-data' }
 SLDeadCodeElimination >> findAndHandleStatementsVariablesIn: aNode [
 
 	aNode isVariable ifTrue: [

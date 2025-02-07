@@ -2076,7 +2076,7 @@ TMethod >> locals: aCollection [
 	"The local variables of this method."
 
 	cachedLocals := nil.
-	parseTree locals: aCollection
+	parseTree locals: aCollection asSet
 ]
 
 { #category : 'transformations' }
