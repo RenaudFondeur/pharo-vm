@@ -1249,9 +1249,10 @@ methodToBeTranslatedWithIfAndShiftRight(void)
 
 { #category : 'tests-inline-builtins' }
 SlangBasicTranslationTest >> testInlineMethodSumArgumentsWithAnnotations [
-	| tMethod translation |
 
-	tMethod := (self getTMethodFrom: #methodUseParametersWithAnnotations:to:with:).
+	| tMethod translation |
+	tMethod := self getTMethodFrom:
+		           #methodUseParametersWithAnnotations:to:with:.
 	" Adding a method already does prepare methods "
 	generator doBasicInlining: true.
 
@@ -1259,17 +1260,18 @@ SlangBasicTranslationTest >> testInlineMethodSumArgumentsWithAnnotations [
 	translation := translation trimBoth.
 	self
 		assert: translation
-		equals: '/* SlangBasicTranslationTestClass>>#methodUseParametersWithAnnotations:to:with: */
+		equals:
+			'/* SlangBasicTranslationTestClass>>#methodUseParametersWithAnnotations:to:with: */
 static sqInt
 methodUseParametersWithAnnotationstowith(unsigned int *_pFrom, unsigned int *_pTo, sqInt _anInteger)
 {
 	sqInt _i;
-	unsigned int *_pTo1;
+	unsigned int *_pTo2;
 
 	/* begin methodFromWithAnnotations:to:len: */
-	_pTo1 = ((unsigned int *) (yourself(_pTo)) );
+	_pTo2 = ((unsigned int *) (yourself(_pTo)) );
 	for (_i = 0; _i < 5; _i += 1) {
-		_pTo1[_i] = (_pFrom + _anInteger)[_i];
+		_pTo2[_i] = (_pFrom + _anInteger)[_i];
 	}
 	return 0;
 	/* end methodFromWithAnnotations:to:len: */
