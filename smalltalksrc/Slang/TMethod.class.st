@@ -3372,11 +3372,14 @@ TMethod >> unusedNamePrefixedBy: aString avoiding: usedNames [
 	 the names in the given collection. The selected name is added to usedNames."
 
 	| n newVarName |
-	n := 1.
-	[newVarName := aString, n printString.
-	 usedNames includes: newVarName] whileTrue:
-		[n := n + 1].
-	^usedNames add: newVarName
+	self halt.
+	n := (usedNames includes: aString)
+		     ifTrue: [ 2 ]
+		     ifFalse: 1.
+	[
+	newVarName := aString , n printString.
+	usedNames includes: newVarName ] whileTrue: [ n := n + 1 ].
+	^ usedNames add: newVarName
 ]
 
 { #category : 'inlining' }

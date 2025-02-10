@@ -18,6 +18,15 @@ SLDeadCodeEliminationAlgoTest >> astTranslate: tast inStream: aWriteStream [
 	cAST acceptVisitor: prettyPrinter.
 ]
 
+{ #category : 'running' }
+SLDeadCodeEliminationAlgoTest >> setUp [
+
+	super setUp.
+	ccg addClass: SLDeadCodeEliminationAlgoTestClass.
+	ccg inferTypes.
+	sLDeadCodeElimination := SLDeadCodeElimination new codeGenerator: ccg
+]
+
 { #category : 'debug' }
 SLDeadCodeEliminationAlgoTest >> testInlineInSwitchRemovesReturnStatement [
 
