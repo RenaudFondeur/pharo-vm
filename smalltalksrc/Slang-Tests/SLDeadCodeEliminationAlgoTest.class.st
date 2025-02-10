@@ -23,6 +23,8 @@ SLDeadCodeEliminationAlgoTest >> setUp [
 
 	super setUp.
 	ccg addClass: SLDeadCodeEliminationAlgoTestClass.
+	"necessary to get the type of sqInt"
+	SpurMemoryManager initBytesPerWord: 8.
 	ccg inferTypes.
 	sLDeadCodeElimination := SLDeadCodeElimination new codeGenerator: ccg
 ]

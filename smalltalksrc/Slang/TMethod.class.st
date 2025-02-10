@@ -3372,7 +3372,6 @@ TMethod >> unusedNamePrefixedBy: aString avoiding: usedNames [
 	 the names in the given collection. The selected name is added to usedNames."
 
 	| n newVarName |
-	self halt.
 	n := (usedNames includes: aString)
 		     ifTrue: [ 2 ]
 		     ifFalse: 1.
