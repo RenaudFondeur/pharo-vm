@@ -148,13 +148,18 @@ TBraceCaseNode >> renameLocalVariablesGivenClassVariables: classVariables global
 				 collectingChangesIn: changedVariables ])
 ]
 
-{ #category : 'enumerating' }
+{ #category : 'transformations' }
 TBraceCaseNode >> replaceNodesIn: aDictionary [
 
-	^aDictionary at: self ifAbsent: [
-		self caseLabels: (caseLabels collect: [:node| node replaceNodesIn: aDictionary]).
-		self cases: (cases collect: [:node| node replaceNodesIn: aDictionary]).
-		self]
+	| aDictionaryAtSelf |
+	aDictionaryAtSelf := aDictionary at: self ifAbsent: [ nil ].
+	aDictionaryAtSelf ifNotNil: [ ^ aDictionaryAtSelf copy ].
+
+	self caseLabels:
+		(caseLabels collect: [ :node | node replaceNodesIn: aDictionary ]).
+	self cases:
+		(cases collect: [ :node | node replaceNodesIn: aDictionary ]).
+	^ self
 ]
 
 { #category : 'type inference' }
