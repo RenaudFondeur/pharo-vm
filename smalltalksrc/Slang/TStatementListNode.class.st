@@ -751,9 +751,13 @@ TStatementListNode >> replaceChild: aNode withList: aListOfStatement [
 { #category : 'transformations' }
 TStatementListNode >> replaceNodesIn: aDictionary [
 
-	^aDictionary at: self ifAbsent: [
-		self statements: (statements collect: [ :s | s replaceNodesIn: aDictionary ]).
-		self]
+	| aDictionaryAtSelf |
+	aDictionaryAtSelf := aDictionary at: self ifAbsent: [ nil ].
+	aDictionaryAtSelf ifNotNil: [ ^ aDictionaryAtSelf copy ].
+
+	self statements:
+		(statements collect: [ :s | s replaceNodesIn: aDictionary ]).
+	^ self
 ]
 
 { #category : 'testing' }

@@ -706,10 +706,14 @@ TSendNode >> replaceChild: aNode with: aReplacementNode [
 { #category : 'transformations' }
 TSendNode >> replaceNodesIn: aDictionary [
 
-	^aDictionary at: self ifAbsent: [
-		self receiver: (receiver replaceNodesIn: aDictionary).
-		self arguments: (arguments collect: [ :a | a replaceNodesIn: aDictionary ]).
-		self]
+	| aDictionaryAtSelf |
+	aDictionaryAtSelf := aDictionary at: self ifAbsent: [ nil ].
+	aDictionaryAtSelf ifNotNil: [ ^ aDictionaryAtSelf copy ].
+
+	self receiver: (receiver replaceNodesIn: aDictionary).
+	self arguments:
+		(arguments collect: [ :a | a replaceNodesIn: aDictionary ]).
+	^ self
 ]
 
 { #category : 'accessing' }

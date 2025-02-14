@@ -210,9 +210,7 @@ SLDeadCodeElimination >> initMarkAndWorkList [
 			self markAsStatementAndAddToWorkList: node.
 			self markAsExpressionAndAddToWorkList: node expression ].
 
-		node isGoTo ifTrue: [
-			self markAsStatementAndAddToWorkList: node.
-			self markAsStatement: node label ].
+		node isGoTo ifTrue: [ self markAsStatementAndAddToWorkList: node ].
 
 		node isLabel ifTrue: [ self markAsStatementAndAddToWorkList: node ] ]
 ]

@@ -221,9 +221,12 @@ TReturnNode >> replaceChild: aNode with: aReplacementNode [
 { #category : 'transformations' }
 TReturnNode >> replaceNodesIn: aDictionary [
 
-	^aDictionary at: self ifAbsent: [
-		self expression: (expression replaceNodesIn: aDictionary).
-		self]
+	| aDictionaryAtSelf |
+	aDictionaryAtSelf := aDictionary at: self ifAbsent: [ nil ].
+	aDictionaryAtSelf ifNotNil: [ ^ aDictionaryAtSelf copy ].
+
+	self expression: (expression replaceNodesIn: aDictionary).
+	^ self
 ]
 
 { #category : 'accessing' }

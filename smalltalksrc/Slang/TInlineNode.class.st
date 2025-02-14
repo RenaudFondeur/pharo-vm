@@ -138,11 +138,14 @@ TInlineNode >> renameLocalVariablesGivenClassVariables: classVariables globalVar
 ]
 
 { #category : 'transformations' }
-TInlineNode >> replaceNodesIn: map [
+TInlineNode >> replaceNodesIn: aDictionary [
 
-	^ map at: self ifAbsent: [
-		  self method: (method replaceNodesIn: map).
-		  self ]
+	| aDictionaryAtSelf |
+	aDictionaryAtSelf := aDictionary at: self ifAbsent: [ nil ].
+	aDictionaryAtSelf ifNotNil: [ ^ aDictionaryAtSelf copy ].
+
+	self method: (method replaceNodesIn: aDictionary).
+	^ self
 ]
 
 { #category : 'inlining' }

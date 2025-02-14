@@ -38,10 +38,11 @@ TConstantNode >> asCASTIn: aBuilder [
 
 { #category : 'transformations' }
 TConstantNode >> asPrintfFormatStringNode [
-	^TPrintfFormatStringNode new
-		setValue: value;
-		comment: comment;
-		yourself
+
+	^ TPrintfFormatStringNode new
+		  setValue: value;
+		  comment: comment;
+		  yourself
 ]
 
 { #category : 'accessing' }

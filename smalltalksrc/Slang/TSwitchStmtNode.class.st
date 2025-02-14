@@ -518,17 +518,20 @@ TSwitchStmtNode >> renameLocalVariablesGivenClassVariables: classVariables globa
 { #category : 'transformations' }
 TSwitchStmtNode >> replaceNodesIn: aDictionary [
 
-	^ aDictionary at: self ifAbsent: [
-		  self expression: (expression replaceNodesIn: aDictionary).
-		  self cases:
-			  (cases collect: [ :pair | "<Array with: <Array with: ParseTreeNode> with: TStmtListNode"
-				   {
-					   (pair first collect: [ :labelNode |
-						    labelNode replaceNodesIn: aDictionary ]).
-					   (pair last replaceNodesIn: aDictionary) } ]).
-		  otherwiseOrNil ifNotNil: [
-			  self otherwiseOrNil: (otherwiseOrNil replaceNodesIn: aDictionary) ].
-		  self ]
+	| aDictionaryAtSelf |
+	aDictionaryAtSelf := aDictionary at: self ifAbsent: [ nil ].
+	aDictionaryAtSelf ifNotNil: [ ^ aDictionaryAtSelf copy ].
+
+	self expression: (expression replaceNodesIn: aDictionary).
+	self cases:
+		(cases collect: [ :pair | "<Array with: <Array with: ParseTreeNode> with: TStmtListNode"
+			 {
+				 (pair first collect: [ :labelNode |
+					  labelNode replaceNodesIn: aDictionary ]).
+				 (pair last replaceNodesIn: aDictionary) } ]).
+	otherwiseOrNil ifNotNil: [
+		self otherwiseOrNil: (otherwiseOrNil replaceNodesIn: aDictionary) ].
+	^ self
 ]
 
 { #category : 'accessing' }

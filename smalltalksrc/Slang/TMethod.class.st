@@ -2276,8 +2276,8 @@ TMethod >> prepareMethodIn: aCodeGen [
 									(subNode isConstant and: [
 										 subNode value isString and: [ subNode value includes: $% ] ])
 										ifTrue: [
-										map at: subNode put: subNode asPrintfFormatStringNode ].
-									node replaceNodesIn: map ] ] ] ] ] ]
+										map at: subNode put: subNode asPrintfFormatStringNode ] ].
+								node replaceNodesIn: map ] ] ] ] ]
 ]
 
 { #category : 'primitive compilation' }
@@ -3167,25 +3167,23 @@ TMethod >> transformReturns [
 	"Once the return type has been found or inferred, returns may bneed to be modified.
 	 If the return type is #void, any occurrences of ^expr must be replaced with expr. ^self.
 	 If the type is #sqInt any any occurrences of ^self are replaced with ^0."
-	(returnType == #void or: [returnType == #sqInt]) ifFalse:
-		[^self].
-	parseTree nodesWithParentsDo:
-		[:node :parent|
-		node isReturn ifTrue:
-			[(node expression isVariable and: [node expression name = 'self'])
-				ifTrue:
-					[returnType = #sqInt ifTrue:
-						[node setExpression: (TConstantNode value: 0)]]
-				ifFalse:
-					[returnType = #void ifTrue:
-						[parent
+
+	(#( #void #sqInt ) includes: returnType) ifFalse: [ ^ self ].
+	parseTree nodesWithParentsDo: [ :node :parent |
+		node isReturn ifTrue: [
+			(node expression isVariable and: [ node expression name = 'self' ])
+				ifTrue: [
+					returnType = #sqInt ifTrue: [
+						node setExpression: (TConstantNode value: 0) ] ]
+				ifFalse: [
+					returnType = #void ifTrue: [
+						parent
 							replaceChild: node
-							with: (TStatementListNode new
-									setArguments: #()
-									statements: {node expression.
-												  TReturnNode new 
-													setExpression: (TVariableNode new setName: 'self')
-													yourself})]]]]
+							with:
+								(TStatementListNode new setArguments: #(  ) statements: {
+										 node expression.
+										 (TReturnNode new setExpression:
+											  (TVariableNode new setName: 'self') yourself) }) ] ] ] ]
 ]
 
 { #category : 'transformations' }
@@ -3395,7 +3393,7 @@ TMethod >> validateVariableDeclarationExists: aVariableName [
 
 	| shouldCheckVariable |
 	shouldCheckVariable := (aVariableName beginsWithAnyOf:
-		                       #( #self #cascade #toDoLimit #std )) not.
+		                       #( #self #cascade #std )) not.
 
 	(shouldCheckVariable and: [
 		 (self declaresVariableWithName: aVariableName) not]) ifTrue: [

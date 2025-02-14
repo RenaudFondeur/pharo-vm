@@ -401,10 +401,13 @@ TAssignmentNode >> replaceChild: aNode with: aReplacementNode [
 { #category : 'transformations' }
 TAssignmentNode >> replaceNodesIn: aDictionary [
 
-	^aDictionary at: self ifAbsent: [
-		self variable: (variable replaceNodesIn: aDictionary).
-		self expression: (expression replaceNodesIn: aDictionary).
-		self]
+	| aDictionaryAtSelf |
+	aDictionaryAtSelf := aDictionary at: self ifAbsent: [ nil ].
+	aDictionaryAtSelf ifNotNil: [ ^ aDictionaryAtSelf copy ].
+
+	self variable: (variable replaceNodesIn: aDictionary).
+	self expression: (expression replaceNodesIn: aDictionary).
+	^ self
 ]
 
 { #category : 'accessing' }
