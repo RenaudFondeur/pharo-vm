@@ -1,6 +1,6 @@
 Class {
 	#name : 'SLDeadCodeEliminationTest',
-	#superclass : 'SlangAbstractTestCase',
+	#superclass : 'SLAbstractTranslationTestCase',
 	#instVars : [
 		'sLDeadCodeEliminationVisitor',
 		'sLDeadCodeElimination'
@@ -8,16 +8,6 @@ Class {
 	#category : 'Slang-Tests',
 	#package : 'Slang-Tests'
 }
-
-{ #category : 'helpers' }
-SLDeadCodeEliminationTest >> astTranslate: tast inStream: aWriteStream [ 
-	
-	| cAST prettyPrinter |
-	cAST := tast asCASTIn: ccg.
-	prettyPrinter := CSlangPrettyPrinter new.
-	prettyPrinter writeStream: aWriteStream.
-	cAST acceptVisitor: prettyPrinter.
-]
 
 { #category : 'running' }
 SLDeadCodeEliminationTest >> setUp [
@@ -5420,11 +5410,4 @@ switchWithOnlyCommentSendInReceiver(SLDeadCodeEliminationTestClass * self_in_swi
 		return;
 	}
 }'
-]
-
-{ #category : 'helpers' }
-SLDeadCodeEliminationTest >> translate: tast [
-
-	^ String streamContents: [ :str | 
-		self astTranslate: tast inStream: str ]
 ]

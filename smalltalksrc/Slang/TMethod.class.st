@@ -1025,8 +1025,10 @@ TMethod >> expandAST [
 
 	parseTree nodesDo: [ :node |
 		node isAssignment ifTrue: [ node expandASTIn: self ].
-		(node isSend and: [ node isValueExpansion ]) ifTrue: [
-			node expandASTIn: self ] ]
+		node isSend ifTrue: [
+			node isValueExpansion
+				ifTrue: [ node expandASTIn: self ]
+				ifFalse: [ node expandPrintfIn: self ] ] ]
 ]
 
 { #category : 'accessing' }
