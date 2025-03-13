@@ -1,6 +1,9 @@
 Class {
 	#name : 'SLASTTransformationTestClass',
 	#superclass : 'SlangClass',
+	#instVars : [
+		'something'
+	],
 	#category : 'Slang-Tests',
 	#package : 'Slang-Tests'
 }
@@ -61,6 +64,6 @@ SLASTTransformationTestClass >> methodWithBockValueValueInAssignment [
 
 { #category : 'send-transformation' }
 SLASTTransformationTestClass >> methodWithFPrintF [ 
-	self f: '%d %d %d %d %d %d'
+	something f: '%d %d %d %d %d %d'
 		printf:{	1. 2. 3. 4. 5. 6 }.
 ]

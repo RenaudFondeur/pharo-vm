@@ -174,7 +174,7 @@ SLASTTransformationTest >> testMethodWithFPrintF [
 static sqInt
 methodWithFPrintF(void)
 {
-	fprintf("%d %d %d %d %d %d", 1, 2, 3, 4, 5, 6);
+	fprintf(something, "%d %d %d %d %d %d", 1, 2, 3, 4, 5, 6);
 	return 0;
 }'
 ]
