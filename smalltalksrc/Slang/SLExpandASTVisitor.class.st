@@ -15,7 +15,7 @@ SLExpandASTVisitor >> currentMethod: aTMethod [
 	currentTMethod := aTMethod
 ]
 
-{ #category : 'initialize' }
+{ #category : 'initialization' }
 SLExpandASTVisitor >> initTranslationDictionary [
 	
 	| pairs |
@@ -36,7 +36,7 @@ SLExpandASTVisitor >> initTranslationDictionary [
 		translationDictionary at: (pairs at: i) put: (pairs at: i + 1)].
 ]
 
-{ #category : 'initialize' }
+{ #category : 'initialization' }
 SLExpandASTVisitor >> initialize [ 
 	super initialize .
 	self initTranslationDictionary
