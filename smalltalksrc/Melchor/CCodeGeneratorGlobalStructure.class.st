@@ -325,7 +325,9 @@ actually what will happen is the folding code will fold these variables into the
 	globalVariableUsage := globalVariableUsage select: [ :e | e size > 1 ].
 	globalVariableUsageKeys := globalVariableUsage keys.
 	globalsToDelete := variables reject: [ :var |
-		                   globalVariableUsageKeys includes: var ].
+		                   (globalVariableUsageKeys includes: var) or: [
+			                   ((variableDeclarations at: var ifAbsent: [ '' ])
+				                    beginsWith: 'extern') or: [ var = #sendTrace ] ] ].
 	globalsToDelete do: [ :var | self removeVariable: var ]
 ]
 
