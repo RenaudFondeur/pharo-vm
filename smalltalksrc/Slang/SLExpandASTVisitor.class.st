@@ -107,7 +107,7 @@ SLExpandASTVisitor >> visitStatementListNode: aStatementListNode [
 SLExpandASTVisitor >> visitSwitchStatementNode: aSwitchStatmentNode [
 
 	self visit: aSwitchStatmentNode expression.
-	aSwitchStatmentNode cases: [ :cases |  ]
+	aSwitchStatmentNode cases: [ :cases | self visit: cases second ]
 ]
 
 { #category : 'visiting' }

@@ -32,7 +32,6 @@ SLDeadCodeEliminationTest >> testConditionalWithOnlyCommentNoSendInReceiver [
 	ccg doBasicInlining: true.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -62,7 +61,6 @@ SLDeadCodeEliminationTest >> testConditionalWithOnlyCommentSendInReceiver [
 	ccg doBasicInlining: true.
 	
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -91,7 +89,6 @@ SLDeadCodeEliminationTest >> testMethodAddingCallInCoerce [
 	tMethod := ccg methodNamed: #methodAddingCallInCoerce.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -119,7 +116,6 @@ SLDeadCodeEliminationTest >> testMethodWithBlockValueAssignmentIntoSameVariableI
 		           #methodWithBlockValueAssignmentIntoSameVariableInArguments.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
@@ -152,7 +148,6 @@ SLDeadCodeEliminationTest >> testMethodWithBlockValueAssignmentNotIntoSameVariab
 		           #methodWithBlockValueAssignmentNotIntoSameVariableInArguments.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
@@ -188,7 +183,6 @@ SLDeadCodeEliminationTest >> testMethodWithBlockValueValueAssignmentIntoSameVari
 		           #methodWithBlockValueValueAssignmentIntoSameVariableInArguments.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -225,7 +219,6 @@ SLDeadCodeEliminationTest >> testMethodWithBlockValueValueAssignmentNotIntoSameV
 		           #methodWithBlockValueValueAssignmentNotIntoSameVariableInArguments.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -265,7 +258,6 @@ SLDeadCodeEliminationTest >> testMethodWithCallInCoerce [
 	tMethod := ccg methodNamed: #methodWithCallInCoerce.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -293,7 +285,6 @@ SLDeadCodeEliminationTest >> testMethodWithConstantInAssignment [
 	tMethod := ccg methodNamed: #methodWithConstantInAssignment.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -321,7 +312,6 @@ SLDeadCodeEliminationTest >> testMethodWithConstantInReturn [
 	tMethod := ccg methodNamed: #methodWithConstantInReturn.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -346,7 +336,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInRepeat [
 	tMethod := ccg methodNamed: #methodWithDeadCodeInRepeat.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -375,7 +364,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInTimesRepeat [
 	tMethod := ccg methodNamed: #methodWithDeadCodeInTimesRepeat.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
@@ -413,7 +401,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInToByDo [
 	tMethod := ccg methodNamed: #methodWithDeadCodeInToByDo.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -442,7 +429,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInToDo [
 	tMethod := ccg methodNamed: #methodWithDeadCodeInToDo.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -472,7 +458,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInWhileFalse [
 		           #methodWithDeadCodeInWhileFalseLastExpressionIsLeaf.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -502,7 +487,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInWhileFalseBinaryNoSendInRec
 		           #methodWithDeadCodeInWhileFalseBinaryNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
@@ -537,7 +521,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInWhileFalseBinarySendInRecei
 		           #methodWithDeadCodeInWhileFalseBinarySendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -567,7 +550,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInWhileTrue [
 		           #methodWithDeadCodeInWhileTrueLastExpressionIsLeaf.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -597,7 +579,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInWhileTrueBinaryNoSendInRece
 		           #methodWithDeadCodeInWhileTrueBinaryNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
@@ -632,7 +613,6 @@ SLDeadCodeEliminationTest >> testMethodWithDeadCodeInWhileTrueBinarySendInReceiv
 		           #methodWithDeadCodeInWhileTrueBinarySendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -663,7 +643,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyCaseOfNoSendInReceiver [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -701,7 +680,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyCaseOfOtherwiseNoSendInReceiver 
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -730,7 +708,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyCaseOfOtherwiseSendInReceiver [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -761,7 +738,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyCaseOfSendInReceiver [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -799,7 +775,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfFalseIfTrueAndNoSendInReceiver
 		           #methodWithEmptyIfFalseIfTrueAndNoSendInReceiver.
 		
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -827,7 +802,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfFalseIfTrueAndSendInReceiver [
 		           #methodWithEmptyIfFalseIfTrueAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -861,7 +835,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfFalseInIfFalseIfTrueAndNoSendI
 		           #methodWithEmptyIfFalseInIfFalseIfTrueAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -894,7 +867,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfFalseInIfFalseIfTrueAndSendInR
 		           #methodWithEmptyIfFalseInIfFalseIfTrueAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -925,7 +897,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfFalseInIfTrueIfFalseAndNoSendI
 		           #methodWithEmptyIfFalseInIfTrueIfFalseAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -958,7 +929,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfFalseInIfTrueIfFalseAndSendInR
 		           #methodWithEmptyIfFalseInIfTrueIfFalseAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -989,7 +959,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfNilIfNotNilAndNoSendInReceiver
 		           #methodWithEmptyIfNilIfNotNilAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1017,7 +986,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfNilIfNotNilAndSendInReceiver [
 		           #methodWithEmptyIfNilIfNotNilAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1048,7 +1016,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfNotNilIfNilAndNoSendInReceiver
 		           #methodWithEmptyIfNotNilIfNilAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1076,7 +1043,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfNotNilIfNilAndSendInReceiver [
 		           #methodWithEmptyIfNotNilIfNilAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1107,7 +1073,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfTrueIfFalseAndNoSendInReceiver
 		           #methodWithEmptyIfTrueIfFalseAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1135,7 +1100,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfTrueIfFalseAndSendInReceiver [
 		           #methodWithEmptyIfTrueIfFalseAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1169,7 +1133,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfTrueInIfFalseIfTrueAndNoSendIn
 		           #methodWithEmptyIfTrueInIfFalseIfTrueAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1202,7 +1165,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfTrueInIfFalseIfTrueAndSendInRe
 		           #methodWithEmptyIfTrueInIfFalseIfTrueAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1233,7 +1195,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfTrueInIfTrueIfFalseAndNoSendIn
 		           #methodWithEmptyIfTrueInIfTrueIfFalseAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1266,7 +1227,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyIfTrueInIfTrueIfFalseAndSendInRe
 		           #methodWithEmptyIfTrueInIfTrueIfFalseAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1296,7 +1256,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyWhileFalseNoSendInCondition [
 		           #methodWithEmptyWhileFalseNoSendInCondition.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1322,7 +1281,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyWhileFalseSendInCondition [
 	tMethod := ccg methodNamed: #methodWithEmptyWhileFalseSendInCondition.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1352,7 +1310,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyWhileTrueNoSendInCondition [
 		           #methodWithEmptyWhileTrueNoSendInCondition.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	
 	translation := self translate: tMethod.
@@ -1378,7 +1335,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyWhileTrueSendInCondition [
 	tMethod := ccg methodNamed: #methodWithEmptyWhileTrueSendInCondition.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1409,7 +1365,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNilInIfNilIfNotNilAndNoSendInR
 		           #methodWithEmptyifNilInIfNilIfNotNilAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1442,7 +1397,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNilInIfNilIfNotNilAndSendInRec
 		           #methodWithEmptyifNilInIfNilIfNotNilAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1475,7 +1429,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNilInIfNotNilIfNilAndNoSendInR
 		           #methodWithEmptyifNilInIfNotNilIfNilAndNoSendInReceiver.
 	
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1508,7 +1461,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNilInIfNotNilIfNilAndSendInRec
 		           #methodWithEmptyifNilInIfNotNilIfNilAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1541,7 +1493,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNotNilInIfNilIfNotNilAndNoSend
 		           #methodWithEmptyifNotNilInIfNilIfNotNilAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1574,7 +1525,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNotNilInIfNilIfNotNilAndSendIn
 		           #methodWithEmptyifNotNilInIfNilIfNotNilAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1607,7 +1557,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNotNilInIfNotNilIfNilAndNoSend
 		           #methodWithEmptyifNotNilInIfNotNilIfNilAndNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1640,7 +1589,6 @@ SLDeadCodeEliminationTest >> testMethodWithEmptyifNotNilInIfNotNilIfNilAndSendIn
 		           #methodWithEmptyifNotNilInIfNotNilIfNilAndSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1671,7 +1619,6 @@ SLDeadCodeEliminationTest >> testMethodWithInstanceVariableInAssignment [
 	tMethod := ccg methodNamed: #methodWithInstanceVariableInAssignment.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1698,7 +1645,6 @@ SLDeadCodeEliminationTest >> testMethodWithInstanceVariableInReturn [
 	tMethod := ccg methodNamed: #methodWithInstanceVariableInReturn.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1723,7 +1669,6 @@ SLDeadCodeEliminationTest >> testMethodWithNeverUsedLocals [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -1754,7 +1699,6 @@ SLDeadCodeEliminationTest >> testMethodWithNeverUsedLocalsFromBlock [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -1787,7 +1731,6 @@ SLDeadCodeEliminationTest >> testMethodWithNeverUsedLocalsFromBlockStatement [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1822,7 +1765,6 @@ SLDeadCodeEliminationTest >> testMethodWithNeverUsedLocalsFromBlockWithExpressio
 
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -1857,7 +1799,6 @@ SLDeadCodeEliminationTest >> testMethodWithNeverUsedLocalsFromBlockasArguments [
 	ccg doBasicInlining: true.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -1883,7 +1824,6 @@ SLDeadCodeEliminationTest >> testMethodWithNoRedundantLocalDefinition [
 	tMethod := ccg methodNamed: #methodWithNoRedundantLocalDefinition.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1923,7 +1863,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyBlockValueAssignmentIntoSameVaria
 		           #methodWithOnlyBlockValueAssignmentIntoSameVariableInArguments.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -1950,7 +1889,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyBlockValueAssignmentNotIntoSameVa
 		           #methodWithOnlyBlockValueAssignmentNotIntoSameVariableInArguments.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -1984,7 +1922,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyComment [
 
 	ccg doBasicInlining: true.
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2012,7 +1949,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyDeadCodeInRepeat [
 	tMethod := ccg methodNamed: #methodWithOnlyDeadCodeInRepeat.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2040,7 +1976,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyDeadCodeInWhileFalse [
 	tMethod := ccg methodNamed: #methodWithOnlyDeadCodeInWhileFalse.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2069,7 +2004,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyDeadCodeInWhileFalseBinaryNoSendI
 		           #methodWithOnlyDeadCodeInWhileFalseBinaryNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedNodesInBranch: ccg.
 
@@ -2097,7 +2031,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyDeadCodeInWhileFalseBinarySendInR
 		           #methodWithOnlyDeadCodeInWhileFalseBinarySendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2128,7 +2061,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyDeadCodeInWhileTrue [
 	tMethod := ccg methodNamed: #methodWithOnlyDeadCodeInWhileTrue.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2157,7 +2089,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyDeadCodeInWhileTrueBinaryNoSendIn
 		           #methodWithOnlyDeadCodeInWhileTrueBinaryNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2186,7 +2117,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyDeadCodeInWhileTrueBinarySendInRe
 		           #methodWithOnlyDeadCodeInWhileTrueBinarySendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2218,7 +2148,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyNeverUsedLocals [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2245,7 +2174,6 @@ SLDeadCodeEliminationTest >> testMethodWithOnlyUselessAssignment [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2273,7 +2201,6 @@ SLDeadCodeEliminationTest >> testMethodWithRedundantLocalDefinition [
 	tMethod := ccg methodNamed: #methodWithRedundantLocalDefinition.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2310,7 +2237,6 @@ SLDeadCodeEliminationTest >> testMethodWithSelfAssign [
 	tMethod := ccg methodNamed: #methodWithSelfAssign.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2338,7 +2264,6 @@ SLDeadCodeEliminationTest >> testMethodWithSendWithNoSideEffectInCoerce [
 	tMethod := ccg methodNamed: #methodWithSendWithNoSideEffectInCoerce.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	
 	translation := self translate: tMethod.
@@ -2364,7 +2289,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstant [
 	tMethod := ccg methodNamed: #methodWithUnusedConstant.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2393,7 +2317,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantAndReturnInCaseOfNoSend
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -2438,7 +2361,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantAndReturnInCaseOfSendIn
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -2478,7 +2400,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInCaseOfAndReturnInOthe
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -2521,7 +2442,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInCaseOfAndReturnInOthe
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -2563,7 +2483,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInCaseOfAndUnusedConsta
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -2591,7 +2510,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInCaseOfAndUnusedConsta
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -2622,7 +2540,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInCaseOfNoSendInExpress
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2657,7 +2574,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInCaseOfSendInExpressio
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2689,7 +2605,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInCoerce [
 	tMethod := ccg methodNamed: #methodWithUnusedConstantInCoerce.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2714,7 +2629,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfFalseIfTrueNoSendIn
 		           #methodWithUnusedConstantInIfFalseIfTrueNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2739,7 +2653,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfFalseIfTrueSendInRe
 		           #methodWithUnusedConstantInIfFalseIfTrueSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2771,7 +2684,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfFalseNoSendInReceiv
 		           #methodWithUnusedConstantInIfFalseNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2798,7 +2710,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfFalseSendInReceiver
 		           #methodWithUnusedConstantInIfFalseSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2830,7 +2741,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNilIfNotNilNoSendIn
 		           #methodWithUnusedConstantInIfNilIfNotNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2857,7 +2767,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNilIfNotNillSendInR
 		           #methodWithUnusedConstantInIfNilIfNotNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2887,7 +2796,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNilNoSendInReceiver
 		           #methodWithUnusedConstantInIfNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	
 	translation := self translate: tMethod.
@@ -2914,7 +2822,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNilSendInReceiver [
 		           #methodWithUnusedConstantInIfNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2944,7 +2851,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNotNilIfNilNoSendIn
 		           #methodWithUnusedConstantInIfNotNilIfNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -2971,7 +2877,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNotNilIfNilSendInRe
 		           #methodWithUnusedConstantInIfNotNilIfNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3001,7 +2906,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNotNilNoSendInRecei
 		           #methodWithUnusedConstantInIfNotNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3028,7 +2932,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfNotNilSendInReceive
 		           #methodWithUnusedConstantInIfNotNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3058,7 +2961,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfTrueIfFalseNoSendIn
 		           #methodWithUnusedConstantInIfTrueIfFalseNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3085,7 +2987,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfTrueIfFalseSendInRe
 		           #methodWithUnusedConstantInIfTrueIfFalseSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3117,7 +3018,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfTrueNoSendInReceive
 		           #methodWithUnusedConstantInIfTrueNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3144,7 +3044,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantInIfTrueSendInReceiver 
 		           #methodWithUnusedConstantInIfTrueSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3178,7 +3077,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantReturnInCaseOfAndUnused
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -3219,7 +3117,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedConstantReturnInCaseOfAndUnused
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3256,7 +3153,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariable [
 	tMethod := ccg methodNamed: #methodWithUnusedInstanceVariable.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3285,7 +3181,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableAndReturnInCase
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3324,7 +3219,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableAndReturnInCase
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3363,7 +3257,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInCaseOfAndRetu
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3401,7 +3294,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInCaseOfAndRetu
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3439,7 +3331,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInCaseOfAndUnus
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3466,7 +3357,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInCaseOfAndUnus
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3496,7 +3386,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInCaseOfNoSendI
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3533,7 +3422,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInCaseOfSendInE
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -3568,7 +3456,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInCoerce [
 	tMethod := ccg methodNamed: #methodWithUnusedInstanceVariableInCoerce.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3595,7 +3482,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfFalseIfTrue
 		           #methodWithUnusedInstanceVariableInIfFalseIfTrueNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3622,7 +3508,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfFalseIfTrue
 		           #methodWithUnusedInstanceVariableInIfFalseIfTrueSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3654,7 +3539,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfFalseNoSend
 		           #methodWithUnusedInstanceVariableInIfFalseNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3681,7 +3565,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfFalseSendIn
 		           #methodWithUnusedInstanceVariableInIfFalseSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3713,7 +3596,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNilIfNotNil
 		           #methodWithUnusedInstanceVariableInIfNilIfNotNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3740,7 +3622,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNilIfNotNil
 		           #methodWithUnusedInstanceVariableInIfNilIfNotNilSendInReceiver.
 	
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	
 	translation := self translate: tMethod.
@@ -3770,7 +3651,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNilNoSendIn
 		           #methodWithUnusedInstanceVariableInIfNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3797,7 +3677,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNilSendInRe
 		           #methodWithUnusedInstanceVariableInIfNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3827,7 +3706,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNotNilIfNil
 		           #methodWithUnusedInstanceVariableInIfNotNilIfNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3854,7 +3732,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNotNilIfNil
 		           #methodWithUnusedInstanceVariableInIfNotNilIfNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3884,7 +3761,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNotNilNoSen
 		           #methodWithUnusedInstanceVariableInIfNotNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3911,7 +3787,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfNotNilSendI
 		           #methodWithUnusedInstanceVariableInIfNotNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	translation := self translate: tMethod.
 	translation := translation trimBoth.
@@ -3940,7 +3815,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfTrueIfFalse
 		           #methodWithUnusedInstanceVariableInIfTrueIfFalseNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3967,7 +3841,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfTrueIfFalse
 		           #methodWithUnusedInstanceVariableInIfTrueIfFalseSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -3999,7 +3872,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfTrueNoSendI
 		           #methodWithUnusedInstanceVariableInIfTrueNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4026,7 +3898,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableInIfTrueSendInR
 		           #methodWithUnusedInstanceVariableInIfTrueSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4060,7 +3931,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableReturnInCaseOfA
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4105,7 +3975,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedInstanceVariableReturnInCaseOfA
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4147,7 +4016,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariable [
 	tMethod := ccg methodNamed: #methodWithUnusedVariable.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -4177,7 +4045,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableAndReturnInCaseOfNoSend
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -4220,7 +4087,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableAndReturnInCaseOfSendIn
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4262,7 +4128,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInCaseOfAndReturnInOthe
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4303,7 +4168,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInCaseOfAndReturnInOthe
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4344,7 +4208,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInCaseOfAndUnusedVariab
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4373,7 +4236,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInCaseOfAndUnusedVariab
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4405,7 +4267,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInCaseOfNoSendInExpress
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 
@@ -4443,7 +4304,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInCaseOfSendInExpressio
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4477,7 +4337,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInCoerce [
 	tMethod := ccg methodNamed: #methodWithUnusedVariableInCoerce.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	
 	translation := self translate: tMethod.
@@ -4504,7 +4363,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfFalseIfTrueNoSendIn
 		           #methodWithUnusedVariableInIfFalseIfTrueNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4531,7 +4389,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfFalseIfTrueSendInRe
 		           #methodWithUnusedVariableInIfFalseIfTrueSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4563,7 +4420,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfFalseNoSendInReceiv
 		           #methodWithUnusedVariableInIfFalseNoSendInReceiver.
 		
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4590,7 +4446,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfFalseSendInReceiver
 		           #methodWithUnusedVariableInIfFalseSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4623,8 +4478,8 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNilIfNotNilNoSendIn
 		           #methodWithUnusedVariableInIfNilIfNotNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
+	
 	translation := self translate: tMethod.
 	translation := translation trimBoth.
 
@@ -4649,7 +4504,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNilIfNotNilSendInRe
 		           #methodWithUnusedVariableInIfNilIfNotNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4678,9 +4532,7 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNilNoSendInReceiver
 	tMethod := ccg methodNamed:
 		           #methodWithUnusedVariableInIfNilNoSendInReceiver.
 
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4707,7 +4559,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNilSendInReceiver [
 		           #methodWithUnusedVariableInIfNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4737,7 +4588,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNotNilIfNilNoSendIn
 		           #methodWithUnusedVariableInIfNotNilIfNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4764,7 +4614,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNotNilIfNilSendInRe
 		           #methodWithUnusedVariableInIfNotNilIfNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4794,7 +4643,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNotNilNoSendInRecei
 		           #methodWithUnusedVariableInIfNotNilNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4821,7 +4669,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfNotNilSendInReceive
 		           #methodWithUnusedVariableInIfNotNilSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4851,7 +4698,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfTrueIfFalseNoSendIn
 		           #methodWithUnusedVariableInIfTrueIfFalseNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4878,7 +4724,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfTrueIfFalseSendInRe
 		           #methodWithUnusedVariableInIfTrueIfFalseSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4910,7 +4755,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfTrueNoSendInReceive
 		           #methodWithUnusedVariableInIfTrueNoSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4937,7 +4781,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableInIfTrueSendInReceiver 
 		           #methodWithUnusedVariableInIfTrueSendInReceiver.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -4970,7 +4813,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableReturnInCaseOfAndUnused
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -5011,7 +4853,6 @@ SLDeadCodeEliminationTest >> testMethodWithUnusedVariableReturnInCaseOfAndUnused
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
@@ -5052,7 +4893,6 @@ SLDeadCodeEliminationTest >> testMethodWithUselessAssignment [
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -5084,7 +4924,6 @@ SLDeadCodeEliminationTest >> testMethodWithUselessCodeInBinaryIterativeNoSendInL
 	tMethod prepareMethodIn: ccg.
 	
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -5119,7 +4958,6 @@ SLDeadCodeEliminationTest >> testMethodWithUselessCodeInBinaryIterativeSendWithN
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -5152,7 +4990,6 @@ SLDeadCodeEliminationTest >> testMethodWithUselessCodeInBinaryIterativeSendWithS
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -5187,8 +5024,6 @@ SLDeadCodeEliminationTest >> testMethodWithUselessLocalsDefinitionsWithSameNameI
 	tMethod prepareMethodIn: ccg.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
-
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 	tMethod removeUnusedTempsAndNilIfRequiredIn: ccg.
 
@@ -5390,7 +5225,6 @@ SLDeadCodeEliminationTest >> testSwitchWithOnlyCommentSendInReceiver [
 	ccg doBasicInlining: true.
 
 	sLDeadCodeElimination currentMethod: tMethod.
-	ccg currentMethod: tMethod.
 	sLDeadCodeElimination removeDeadCodeInCurrentMethod.
 
 	translation := self translate: tMethod.
