@@ -16,7 +16,7 @@ SLInliningTest class >> testParameters [
 	^ ParametrizedTestMatrix new
 		  forSelector: #inliningStrategy
 		  addOptions:
-			  { "#useExtractedInlining." #useNewInlining };
+			  { #useExtractedInlining." #useNewInlining "};
 		  yourself
 ]
 

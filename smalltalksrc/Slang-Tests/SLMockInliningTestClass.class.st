@@ -1,6 +1,9 @@
 Class {
 	#name : 'SLMockInliningTestClass',
 	#superclass : 'SlangClass',
+	#instVars : [
+		'globalVariable'
+	],
 	#category : 'Slang-Tests',
 	#package : 'Slang-Tests'
 }
@@ -439,7 +442,7 @@ SLMockInliningTestClass >> methodWithAssignmentOnToDoInlined [
 SLMockInliningTestClass >> methodWithAssignmentOnWhileTrueBinaryInlined [
 
 	| a |
-	a := self methodWithWhileTrueBinary
+	a := self methodB ifTrue: [self methodWithWhileTrueBinary]
 ]
 
 { #category : 'inlining-iterative' }

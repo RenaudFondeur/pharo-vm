@@ -13,6 +13,14 @@ SLNodeAnnotatorVisitorTestClass >> emptyMethod [
 SLNodeAnnotatorVisitorTestClass >> emptyMethod: arg [
 ]
 
+{ #category : 'as yet unclassified' }
+SLNodeAnnotatorVisitorTestClass >> methodMustBeInlinedOrIsFunctional [
+]
+
+{ #category : 'as yet unclassified' }
+SLNodeAnnotatorVisitorTestClass >> methodMustBeInlinedOrIsFunctional: anArg [
+]
+
 { #category : 'assignment' }
 SLNodeAnnotatorVisitorTestClass >> methodWithAssignment [
 
