@@ -17,7 +17,12 @@ SLMockInliningTestClass >> emptyMethod: arg [
 { #category : 'inlining-arguments' }
 SLMockInliningTestClass >> emptyMethodAWithArgumentsInlined [
 
-	self emptyMethod: self methodCAlwaysInlined
+
+	self methodWithReturn.
+	
+	
+"	a := self methodWithReturn.
+	^ self methodWithReturn"
 ]
 
 { #category : 'inlining-arguments' }
@@ -411,6 +416,15 @@ SLMockInliningTestClass >> methodCSimpleReturn [
 	^ 3 + 3
 ]
 
+{ #category : 'inlining-arguments' }
+SLMockInliningTestClass >> methodExample [
+
+	| a |
+	a := self methodWithMultipleReturn
+	
+
+]
+
 { #category : 'inlining-variable' }
 SLMockInliningTestClass >> methodInlineVariableWithSameName [
 	| a |
@@ -519,6 +533,17 @@ SLMockInliningTestClass >> methodWithMultipleBooleanReturn [
 	^ true
 ]
 
+{ #category : 'inlining-arguments' }
+SLMockInliningTestClass >> methodWithMultipleReturn [
+
+	| a b |
+	a := b := 0.
+	a > b ifTrue: [ ^ 1 + 1 ].
+	^ 2 + 2
+	
+
+]
+
 { #category : 'inlining-perform-send' }
 SLMockInliningTestClass >> methodWithPerformSend [
 
@@ -549,6 +574,12 @@ SLMockInliningTestClass >> methodWithRepeat [
 	[
 	self methodB ifTrue: [ ^ 5 ].
 	self methodB ] repeat
+]
+
+{ #category : 'inlining-arguments' }
+SLMockInliningTestClass >> methodWithReturn [
+	
+	^ 2 + 2
 ]
 
 { #category : 'inlining-conditional-receiver' }

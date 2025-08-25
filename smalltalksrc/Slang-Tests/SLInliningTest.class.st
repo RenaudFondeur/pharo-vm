@@ -1314,7 +1314,7 @@ SLInliningTest >> testMethodWithBlockWithReturningIfWithInlinedArgumentInlined [
 
 	| method translation |
 	method := self addMethodAndMethodCalledBy:
-		          #methodWithBlockWithReturningIfWithInlinedArgumentInlined.
+		          #methodExample.
 	self doInliningIn: method.
 
 	translation := self translate: method.
@@ -1347,7 +1347,45 @@ methodWithBlockWithReturningIfWithInlinedArgumentInlined(void)
 	}
 	/* end methodWithBlockArgument: */
 	return 0;
+}'.
+
+'/* SLMockInliningTestClass>>#methodExample */
+static sqInt
+methodExample(void)
+{
+	sqInt a;
+	sqInt a2;
+	int b;
+
+	/* begin methodWithMultipleReturn */
+	a2 = (b = 0);
+	if (a2 > b) {
+		a = 1 + 1;
+		goto l2;
+	}
+	a = 2 + 2;
+	l2:
+	;
+	/* end methodWithMultipleReturn */
+	return 0;
 }'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ]
 
 { #category : 'inlining-conditional-receiver' }
